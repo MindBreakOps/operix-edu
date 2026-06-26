@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx", // هذا السطر هو الأهم لحل مشكلتك
+    "jsx": "react-jsx", 
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
