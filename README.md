@@ -1,32 +1,56 @@
-# React + TypeScript + Vite
+<p align="center">
+  <img src="src/assets/logo.jpeg" alt="OPERIX EDU Logo" width="500" />
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+<h1 align="center">OPERIX EDU | الإدارة المدرسية الرقمية</h1>
+نظام **OPERIX Edu** هو منصة سحابية متكاملة مصممة لإعادة تعريف تجربة الإدارة المدرسية. تم بناء هذا النظام ليوفر حلاً مؤسسياً (Enterprise) يجمع بين رصانة الإدارة الأكاديمية وسلاسة التقنية الحديثة، مما يتيح لقادة المدارس والمعلمين التركيز على جوهر العملية التعليمية.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 المميزات الرئيسية
 
-## React Compiler
+يوفر OPERIX Edu بيئة رقمية متكاملة تضمن كفاءة التشغيل المدرسي اليومي:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Dox Studio**: منصة متقدمة لاستخراج الشهادات الرسمية، إشعارات الدرجات، ووثائق التسجيل بجودة طباعة عالية واحترافية.
+*   **الإدارة الأكاديمية الشاملة**: أدوات دقيقة لتوزيع الجداول الدراسية، إدارة المواد، وتخطيط الاختبارات والواجبات.
+*   **سجل الطلاب الرقمي**: سجلات متكاملة تشمل الأداء الأكاديمي، الحضور والغياب، والسجل السلوكي.
+*   **التحكم المالي**: نظام متكامل لإدارة الرسوم الدراسية، إصدار الفواتير، ومتابعة التحصيل المالي.
+*   **هوية تعليمية موحدة**: واجهات مستخدم مصممة لتعزيز الثقة وسهولة الاستخدام، مما يقلل الحاجة للتدريب التقني المعقد.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 💡 لماذا OPERIX Edu؟
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+*   **الأمن والخصوصية**: تم بناء النظام وفق أعلى معايير أمن المعلومات لضمان خصوصية بيانات الطلاب والمعلمين.
+*   **سهولة التوسع**: بنية تحتية سحابية تضمن استقرار النظام مع نمو أعداد الطلاب أو إضافة فروع جديدة للمؤسسة.
+*   **التحول الرقمي**: التخلص من الإجراءات الورقية التقليدية واعتماد أتمتة شاملة لجميع العمليات الإدارية والأكاديمية.
+*   **دعم فني متميز**: فريق دعم متخصص لمرافقة المؤسسة التعليمية في رحلة تحولها الرقمي.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## 📱 أقسام النظام
+
+تم تقسيم النظام لضمان سلاسة سير العمل:
+
+1.  **لوحة القيادة**: نظرة عامة لحظية على كافة مؤشرات الأداء بالمدرسة.
+2.  **شؤون الطلاب**: سجلات الطالب، أولياء الأمور، الحضور، والسلوك.
+3.  **الشؤون الأكاديمية**: إدارة المواد، الجداول، والواجبات، والنتائج.
+4.  **منصة الوثائق (Dox Studio)**: كل ما يتعلق بإصدار الشهادات والتقارير الرسمية.
+5.  **الإدارة المالية والتعليمية**: إدارة الرسوم والكوادر التعليمية.
+6.  **إعدادات النظام**: التحكم الكامل في الأعوام الدراسية والفصول.
+
+---
+
+## 🔗 التواصل والاشتراك
+
+نظام **OPERIX Edu** هو منتج تقني تملكه شركة **OPERIX Solutions** للأنظمة الرقمية.
+
+للحصول على نسخة تجريبية أو لطلب تفعيل النظام لمؤسستكم التعليمية، يرجى التواصل معنا:
+
+📧 **البريد الإلكتروني للمبيعات:** sales@operix-solutions.com
+🌐 **الموقع الرسمي:** [www.operix-solutions.com](https://www.operix-solutions.com)
+
+*تم تصميم وتطوير OPERIX Edu ليواكب تطلعات المدارس العصرية في ظل التحول الرقمي.*
+
+---
+*© 2026 جميع الحقوق محفوظة لشركة OPERIX Solutions.*
