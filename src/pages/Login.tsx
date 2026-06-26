@@ -1,0 +1,187 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
+import { Lock, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+// استيراد الشعار
+import logo from '../assets/logo.png';
+
+const theme = { navy: '#0f172a', royal: '#2563eb', slate: '#f8fafc', white: '#ffffff', border: '#e2e8f0' };
+
+export default function Login() {
+  const [step, setStep] = useState(1);
+  const [domain, setDomain] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+	if (user) navigate('/app/dashboard');
+  }, [user, navigate]);
+
+  const handleDomainSubmit = (e: React.FormEvent) => {
+	e.preventDefault();
+	if (domain.trim().length < 3) {
+	  setError('الرجاء إدخال نطاق صحيح لمساحة العمل.');
+	  return;
+	}
+	setError('');
+	setStep(2);
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+	e.preventDefault();
+	setError('');
+	setIsSubmitting(true);
+
+	const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+	if (signInError) {
+	  setError('بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.');
+	  setIsSubmitting(false);
+	} else {
+	  window.location.href = '/app/dashboard';
+	}
+  };
+
+  return (
+	<div style={{ minHeight: '100vh', display: 'flex', backgroundColor: theme.slate, direction: 'rtl', fontFamily: 'system-ui, sans-serif' }}>
+	  
+	  {/* القسم الأيمن: نموذج الدخول */}
+	  <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', backgroundColor: theme.white }}>
+		<div style={{ width: '100%', maxWidth: '420px' }}>
+		  
+		  <button onClick={() => step === 2 ? setStep(1) : navigate('/')} style={{ background: 'none', border: 'none', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '40px', fontWeight: 700, fontSize: '0.9rem', padding: 0, transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = theme.navy} onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}>
+			<ArrowRight size={16} /> {step === 2 ? 'العودة لتغيير مساحة العمل' : 'العودة للصفحة الرئيسية'}
+		  </button>
+
+		  {step === 1 ? (
+			<div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+			  {/* عرض الشعار في خطوة النطاق */}
+			  <img src={logo} alt="OPERIX Logo" style={{ height: '56px', objectFit: 'contain', marginBottom: '24px' }} />
+			  
+			  <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: theme.navy, margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>تسجيل الدخول</h1>
+			  <p style={{ color: '#64748b', margin: '0 0 32px 0', fontSize: '1.05rem', lineHeight: 1.6 }}>
+				أهلاً بك في منصة OPERIX Edu. الرجاء إدخال نطاق مساحة العمل الخاصة بمدرستك للبدء.
+			  </p>
+
+			  {error && <div style={{ backgroundColor: '#fef2f2', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', border: '1px solid #fecaca', marginBottom: '24px', fontSize: '0.9rem', fontWeight: 700 }}>{error}</div>}
+
+			  <form onSubmit={handleDomainSubmit}>
+				<label style={{ display: 'block', fontWeight: 800, color: theme.navy, marginBottom: '8px', fontSize: '0.95rem' }}>نطاق المؤسسة التعليمية</label>
+				<div style={{ display: 'flex', alignItems: 'center', border: `2px solid ${theme.border}`, borderRadius: '12px', overflow: 'hidden', transition: 'border-color 0.2s', backgroundColor: '#f8fafc' }}>
+				  <input 
+					type="text" 
+					required autoFocus dir="ltr"
+					value={domain}
+					onChange={(e) => setDomain(e.target.value.toLowerCase().trim())}
+					style={{ flex: 1, padding: '16px', border: 'none', outline: 'none', fontFamily: 'monospace', fontWeight: 800, fontSize: '1.1rem', backgroundColor: 'transparent', textAlign: 'right' }} 
+					placeholder="alnaseem"
+				  />
+				  <div style={{ padding: '16px 20px', backgroundColor: '#e2e8f0', color: theme.navy, fontWeight: 800, borderRight: `2px solid ${theme.border}`, fontFamily: 'monospace', fontSize: '1rem', direction: 'ltr' }}>
+					.operix.edu
+				  </div>
+				</div>
+				<button type="submit" style={{ width: '100%', backgroundColor: theme.navy, color: theme.white, border: 'none', padding: '16px', borderRadius: '12px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer', marginTop: '24px', transition: 'background 0.2s' }}>
+				  المتابعة
+				</button>
+			  </form>
+			</div>
+		  ) : (
+			<div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+			  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: '#ecfdf5', color: '#059669', padding: '8px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 800, marginBottom: '24px' }}>
+				<CheckCircle2 size={16} /> مساحة العمل: {domain}.operix.edu
+			  </div>
+			  <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: theme.navy, margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>بيانات الدخول</h1>
+			  <p style={{ color: '#64748b', margin: '0 0 32px 0', fontSize: '1.05rem' }}>الرجاء إدخال البريد الإلكتروني وكلمة المرور الخاصة بك.</p>
+
+			  {error && <div style={{ backgroundColor: '#fef2f2', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', border: '1px solid #fecaca', marginBottom: '24px', fontSize: '0.9rem', fontWeight: 700 }}>{error}</div>}
+
+			  <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+				<div>
+				  <label style={{ display: 'block', fontWeight: 800, color: theme.navy, marginBottom: '8px', fontSize: '0.95rem' }}>البريد الإلكتروني</label>
+				  <div style={{ position: 'relative' }}>
+					<Mail size={20} color="#94a3b8" style={{ position: 'absolute', right: '16px', top: '16px' }} />
+					<input 
+					  type="email" required dir="ltr" autoFocus
+					  value={email} onChange={(e) => setEmail(e.target.value)}
+					  style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '12px', border: `2px solid ${theme.border}`, outline: 'none', fontFamily: 'inherit', fontWeight: 600, boxSizing: 'border-box', fontSize: '1rem', backgroundColor: '#f8fafc' }} 
+					  placeholder="admin@school.com"
+					/>
+				  </div>
+				</div>
+
+				<div>
+				  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+					<label style={{ fontWeight: 800, color: theme.navy, fontSize: '0.95rem' }}>كلمة المرور</label>
+					<a href="#" style={{ color: theme.royal, fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none' }}>نسيت كلمة المرور؟</a>
+				  </div>
+				  <div style={{ position: 'relative' }}>
+					<Lock size={20} color="#94a3b8" style={{ position: 'absolute', right: '16px', top: '16px' }} />
+					<input 
+					  type="password" required dir="ltr"
+					  value={password} onChange={(e) => setPassword(e.target.value)}
+					  style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '12px', border: `2px solid ${theme.border}`, outline: 'none', fontFamily: 'inherit', fontWeight: 600, boxSizing: 'border-box', fontSize: '1rem', backgroundColor: '#f8fafc' }} 
+					  placeholder="••••••••"
+					/>
+				  </div>
+				</div>
+
+				<button 
+				  type="submit" disabled={isSubmitting}
+				  style={{ backgroundColor: theme.royal, color: theme.white, border: 'none', padding: '16px', borderRadius: '12px', fontWeight: 900, fontSize: '1.1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', marginTop: '12px', transition: 'background 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+				>
+				  {isSubmitting ? 'جاري التحقق...' : 'دخول آمن'}
+				</button>
+			  </form>
+			</div>
+		  )}
+		</div>
+	  </div>
+
+	  {/* القسم الأيسر: الهوية البصرية */}
+	  <div className="no-print" style={{ flex: '1.2', backgroundColor: theme.navy, padding: '60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden', borderRight: `1px solid ${theme.navy}` }}>
+		<div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '800px', height: '800px', borderRadius: '50%', background: `radial-gradient(circle, ${theme.royal}33 0%, transparent 70%)`, filter: 'blur(60px)', zIndex: 0 }}></div>
+		<div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '500px', height: '500px', borderRadius: '50%', background: `radial-gradient(circle, #38bdf822 0%, transparent 70%)`, filter: 'blur(40px)', zIndex: 0 }}></div>
+		
+		<div style={{ position: 'relative', zIndex: 1, maxWidth: '600px', margin: '0 auto', textAlign: 'right' }}>
+		  
+		  {/* عرض الشعار في القسم الإبداعي كعلامة مائية بارزة */}
+		  <div style={{ display: 'inline-block', backgroundColor: theme.white, padding: '16px', borderRadius: '20px', marginBottom: '32px' }}>
+			<img src={logo} alt="OPERIX Logo" style={{ height: '48px', objectFit: 'contain', display: 'block' }} />
+		  </div>
+
+		  <h2 style={{ fontSize: '3.5rem', fontWeight: 900, color: theme.white, margin: '0 0 24px 0', lineHeight: 1.2, letterSpacing: '-1px' }}>
+			بناء جيل واعٍ <br/><span style={{ color: '#60a5fa' }}>يبدأ بإدارة مُحكمة.</span>
+		  </h2>
+		  <p style={{ fontSize: '1.2rem', color: '#94a3b8', lineHeight: 1.8, marginBottom: '40px', maxWidth: '500px' }}>
+			نظام OPERIX Edu يوفر لك أدوات سحابية متقدمة لحماية بيانات طلابك، ومتابعة أدائهم الأكاديمي، وتنظيم الموارد المالية بمنتهى الدقة.
+		  </p>
+		  
+		  <div style={{ display: 'flex', gap: '24px', alignItems: 'center', borderTop: '1px solid #1e293b', paddingTop: '32px' }}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+			  <span style={{ fontSize: '2rem', fontWeight: 900, color: theme.white }}>+500</span>
+			  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700 }}>مدرسة معتمدة</span>
+			</div>
+			<div style={{ width: '1px', height: '40px', backgroundColor: '#1e293b' }}></div>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+			  <span style={{ fontSize: '2rem', fontWeight: 900, color: theme.white }}>99.9%</span>
+			  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700 }}>استقرار الخوادم</span>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+	  <style>{`
+		@keyframes fadeIn {
+		  from { opacity: 0; transform: translateY(10px); }
+		  to { opacity: 1; transform: translateY(0); }
+		}
+	  `}</style>
+	</div>
+  );
+}
