@@ -3,11 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+"scripts": {
+    "build": "vite build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
