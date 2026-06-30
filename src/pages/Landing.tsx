@@ -2,30 +2,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   GraduationCap, BookOpen, ShieldCheck, LineChart, Award, Users, 
-  ChevronLeft, ChevronRight, Globe, Mail, Phone, FileText, 
-  ExternalLink, HelpCircle, X, Sparkles, Building2,
-  CheckCircle, School
+  ChevronLeft, ChevronRight, Globe, Mail, HelpCircle, X, Sparkles, 
+  CheckCircle, School, Search, ChevronDown, FileText
 } from 'lucide-react';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.jpeg';
 
 const OPS_API = 'https://script.google.com/macros/s/AKfycbxzwlFPfOFiUS5atnjkAuXDcr-L_-LSY33_S9d6t12P36qmTWthc00ywCKpReFxzLY/exec';
 const TARGET_EMAIL = 'operixsolution@gmail.com';
 
 const theme = { 
-  navy: '#0f172a', 
-  navyMid: '#1e293b',
-  royal: '#2563eb', 
-  royalLight: '#3b82f6',
-  pencil: '#f59e0b',
-  pencilLight: '#fef3c7',
-  pencilDark: '#d97706',
-  slate: '#f8fafc', 
-  white: '#ffffff', 
-  border: '#e2e8f0', 
-  textMuted: '#64748b',
-  green: '#10b981',
-  ink: '#334155',
+  navy: '#0f172a', navyMid: '#1e293b', royal: '#2563eb', royalLight: '#3b82f6',
+  pencil: '#f59e0b', pencilLight: '#fef3c7', pencilDark: '#d97706',
+  slate: '#f8fafc', white: '#ffffff', border: '#e2e8f0', textMuted: '#64748b',
+  green: '#10b981', ink: '#334155',
 };
+
+// ─── COUNTRIES DATA ───
+const COUNTRIES = [
+  { code: 'SA', name: 'Saudi Arabia', nameAr: 'المملكة العربية السعودية', flag: '🇸🇦', dial: '+966' },
+  { code: 'SD', name: 'Sudan', nameAr: 'السودان', flag: '🇸🇩', dial: '+249' },
+  { code: 'AE', name: 'United Arab Emirates', nameAr: 'الإمارات العربية المتحدة', flag: '🇦🇪', dial: '+971' },
+  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', dial: '+20' },
+  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', dial: '+974' },
+  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', dial: '+965' },
+  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', dial: '+973' },
+  { code: 'OM', name: 'Oman', nameAr: 'عمان', flag: '🇴🇲', dial: '+968' },
+  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', dial: '+962' },
+  { code: 'US', name: 'United States', nameAr: 'الولايات المتحدة', flag: '🇺🇸', dial: '+1' },
+  { code: 'GB', name: 'United Kingdom', nameAr: 'المملكة المتحدة', flag: '🇬🇧', dial: '+44' },
+];
 
 const gasCall = async (payload: any) => {
   try {
@@ -40,7 +45,6 @@ const gasCall = async (payload: any) => {
   }
 };
 
-// ─── HELPER: Highlight OPERIX word ───
 const formatText = (text: string) => {
   if (!text) return text;
   const parts = text.split(/(OPERIX Edu|OPERIX)/g);
@@ -89,113 +93,57 @@ function AcademicSketch({ color = '#e2e8f0', size = 180 }: { color?: string; siz
   );
 }
 
-// ─── TRANSLATIONS ───
 const translations: Record<string, any> = {
   en: {
-	navFeatures: "Features",
-	navVision: "Academic Vision",
-	pricing: "Pricing",
-	login: "Login",
-	supportBtn: "Support",
-	badge: "Enterprise School Edition 2026",
-	heroTitle1: "The future of school management",
-	heroTitle2: "starts here.",
+	navFeatures: "Features", navVision: "Academic Vision", pricing: "Pricing", login: "Login", supportBtn: "Support",
+	badge: "Enterprise School Edition 2026", heroTitle1: "The future of school management", heroTitle2: "starts here.",
 	heroSub: "A fully integrated cloud platform designed specifically to meet the standards of modern educational institutions. We combine academic management rigor with modern technical fluency to empower school leaders and teachers.",
-	demoBtn: "Book a Demo",
-	platformBtn: "Enter Platform",
-	trustBadge1: "41 Global Initiatives",
-	trustBadge2: "5+ Core Solutions",
-	trustBadge3: "High Availability Architecture",
+	demoBtn: "Book a Demo", platformBtn: "Enter Platform",
+	trustBadge1: "41 Global Initiatives", trustBadge2: "5+ Core Solutions", trustBadge3: "High Availability Architecture",
 	visionTitle: "Because a teacher's time is too valuable to waste on paperwork.",
 	visionDesc: '"OPERIX Edu was designed by technical experts with the vision of academic leaders. We understand that educational quality starts with administrative stability. We provide precise tools for grading, behavior analysis, and official certificate generation with a single click, freeing teachers for their highest calling: building minds."',
-	featuresTitle: "Integrated Infrastructure for Future Schools",
-	featuresSub: "Everything school administration needs under one digital roof.",
-	f1Title: "Dox Studio for Certificates",
-	f1Desc: "Instant generation of student certificates and grade reports in 4K print resolution compliant with official formats.",
-	f2Title: "Precise Grading System",
-	f2Desc: "Advanced management of subjects, classes, and assignments, with automated cumulative GPA calculations.",
-	f3Title: "Behavior & Attendance",
-	f3Desc: "Accurate documentation of student attendance and behavioral infractions to ensure a disciplined educational environment.",
-	f4Title: "Parents Management",
-	f4Desc: "Direct connection between student records and parents to facilitate communication and send periodic reports.",
-	statsLabel1: "Total Software Initiatives",
-	statsLabel2: "Core OPERIX Modules",
-	statsLabel3: "Enterprise Clients",
-	statsLabel4: "Platform Stability Runtime",
-	ctaTitle: "Start your smart school journey today",
-	ctaSub: "Join the digital transformation with OPERIX Edu's tailored infrastructure.",
-	footerTagline: "A product by OPERIX Solutions for digital systems.",
-	footerProduct: "Product",
-	footerCompany: "Company",
-	footerContact: "Contact",
-	footerLinks: ["Features", "Pricing", "Book a Demo", "Login"],
-	footerCompanyLinks: ["About OPERIX", "Solutions", "Careers", "Blog"],
-	footerRights: "© 2026 OPERIX Solutions. All rights reserved.",
-	footerVat: "VAT Reg. No: 310XXXXXXXXX | Riyadh, Saudi Arabia",
-	supportTitle: "Support Center",
-	supportSub: "We're here to help you 24/7. Reach out via any channel below.",
-	termsTitle: "Terms of Use & Privacy Policy",
-	termsEffective: "Effective Date: January 1, 2026 | Version 2.1",
-	termsClose: "I Understand & Agree",
-	modalTitle: "Request a Demo",
-	modalSub: "Fill out your school's details and our academic systems team will contact you.",
-	submit: "Send Request",
-	submitting: "Sending...",
+	featuresTitle: "Integrated Infrastructure for Future Schools", featuresSub: "Everything school administration needs under one digital roof.",
+	f1Title: "Dox Studio for Certificates", f1Desc: "Instant generation of student certificates and grade reports in 4K print resolution compliant with official formats.",
+	f2Title: "Precise Grading System", f2Desc: "Advanced management of subjects, classes, and assignments, with automated cumulative GPA calculations.",
+	f3Title: "Behavior & Attendance", f3Desc: "Accurate documentation of student attendance and behavioral infractions to ensure a disciplined educational environment.",
+	f4Title: "Parents Management", f4Desc: "Direct connection between student records and parents to facilitate communication and send periodic reports.",
+	statsLabel1: "Total Software Initiatives", statsLabel2: "Core OPERIX Modules", statsLabel3: "Enterprise Clients", statsLabel4: "Platform Stability Runtime",
+	ctaTitle: "Start your smart school journey today", ctaSub: "Join the digital transformation with OPERIX Edu's tailored infrastructure.",
+	footerTagline: "A product by OPERIX Solutions for digital systems.", footerProduct: "Product", footerCompany: "Company", footerContact: "Contact",
+	footerLinks: ["Features", "Pricing", "Book a Demo", "Login"], footerCompanyLinks: ["About OPERIX", "Solutions", "Careers", "Blog"],
+	footerRights: "© 2026 OPERIX Solutions. All rights reserved.", footerVat: "VAT Reg. No: 310XXXXXXXXX | Riyadh, Saudi Arabia",
+	supportTitle: "Support Center", supportSub: "We're here to help you 24/7. Reach out via any channel below.",
+	termsTitle: "Terms of Use & Privacy Policy", termsEffective: "Effective Date: January 1, 2026 | Version 2.1", termsClose: "I Understand & Agree",
+	modalTitle: "Request a Demo", modalSub: "Fill out your school's details and our academic systems team will contact you.",
+	submit: "Send Request", submitting: "Sending...",
+	phoneLabel: "Country & Phone Number", searchCountry: "Search country...", phonePlaceholder: "Phone number (e.g. 5x xxx xxxx)"
   },
   ar: {
-	navFeatures: "المميزات",
-	navVision: "الرؤية الأكاديمية",
-	pricing: "الأسعار",
-	login: "تسجيل الدخول",
-	supportBtn: "الدعم الفني",
-	badge: "الإصدار المؤسسي للمدارس 2026",
-	heroTitle1: "مستقبل الإدارة المدرسية",
-	heroTitle2: "يبدأ من هنا.",
+	navFeatures: "المميزات", navVision: "الرؤية الأكاديمية", pricing: "الأسعار", login: "تسجيل الدخول", supportBtn: "الدعم الفني",
+	badge: "الإصدار المؤسسي للمدارس 2026", heroTitle1: "مستقبل الإدارة المدرسية", heroTitle2: "يبدأ من هنا.",
 	heroSub: "منصة سحابية متكاملة مصممة خصيصاً لتلبي معايير العمليات التعليمية الحديثة. نجمع بين رصانة الإدارة الأكاديمية وسلاسة التقنية لتمكين قادة المدارس والمعلمين.",
-	demoBtn: "طلب عرض تجريبي",
-	platformBtn: "دخول المنصة",
-	trustBadge1: "41 مشروعاً تقنياً",
-	trustBadge2: "5+ أنظمة أساسية",
-	trustBadge3: "بنية برمجية عالية الاستقرار",
+	demoBtn: "طلب عرض تجريبي", platformBtn: "دخول المنصة",
+	trustBadge1: "41 مشروعاً تقنياً", trustBadge2: "5+ أنظمة أساسية", trustBadge3: "بنية برمجية عالية الاستقرار",
 	visionTitle: "لأن وقت المعلم أثمن من أن يضيع في الأعمال الورقية.",
 	visionDesc: '"صُمم OPERIX Edu بأيدي خبراء تقنيين وبرؤية قادة أكاديميين. نحن ندرك أن جودة التعليم تبدأ من استقرار الإدارة، ولذلك وفرنا أدوات دقيقة لرصد الدرجات، تحليل السلوك، واستخراج الشهادات الرقمية بنقرة واحدة، ليتفرغ المعلم لرسالته الأسمى: بناء العقول."',
-	featuresTitle: "بنية تحتية متكاملة لمدارس المستقبل",
-	featuresSub: "كل ما تحتاجه الإدارة المدرسية تحت سقف رقمي واحد.",
-	f1Title: "Dox Studio للشهادات",
-	f1Desc: "استخراج فوري لشهادات الطلاب وإشعارات الدرجات بدقة طباعة 4K متوافقة مع التنسيقات التنظيمية.",
-	f2Title: "نظام رصد أكاديمي دقيق",
-	f2Desc: "إدارة متقدمة للمواد الدراسية، الفصول، والواجبات، مع حساب آلي للمعدلات التراكمية.",
-	f3Title: "السلوك والمواظبة",
-	f3Desc: "توثيق دقيق لحضور الطلاب ومخالفاتهم السلوكية لضمان بيئة تعليمية منضبطة.",
-	f4Title: "إدارة أولياء الأمور",
-	f4Desc: "ربط مباشر بين بيانات الطالب وولي أمره لتسهيل التواصل وإرسال التقارير الدورية.",
-	statsLabel1: "إجمالي المشروعات الرقمية",
-	statsLabel2: "منظومات OPERIX الأساسية",
-	statsLabel3: "شركاء استراتيجيين",
-	statsLabel4: "معدل استقرار الأداء التشغيلي",
-	ctaTitle: "ابدأ رحلة الإدارة الذكية اليوم",
-	ctaSub: "انضم إلى التحول الرقمي مع بنية OPERIX Edu التحتية المتكاملة.",
-	footerTagline: "إحدى منتجات شركة OPERIX Solutions للأنظمة الرقمية.",
-	footerProduct: "المنتج",
-	footerCompany: "الشركة",
-	footerContact: "التواصل",
-	footerLinks: ["المميزات", "الأسعار", "طلب عرض", "تسجيل الدخول"],
-	footerCompanyLinks: ["عن أوبيريكس", "الحلول", "الوظائف", "المدونة"],
-	footerRights: "© 2026 أوبيريكس سوليوشنز. جميع الحقوق محفوظة.",
-	footerVat: "الرقم الضريبي: 310XXXXXXXXX | الرياض، المملكة العربية السعودية",
-	supportTitle: "مركز الدعم",
-	supportSub: "نحن هنا لمساعدتك على مدار الساعة. تواصل معنا عبر أي قناة أدناه.",
-	termsTitle: "شروط الاستخدام وسياسة الخصوصية",
-	termsEffective: "تاريخ السريان: 1 يناير 2026 | الإصدار 2.1",
-	termsClose: "أوافق وأفهم",
-	modalTitle: "طلب عرض تجريبي",
-	modalSub: "أدخل بيانات المدرسة وسيتواصل معك فريق الأنظمة الأكاديمية قريباً.",
-	submit: "إرسال الطلب",
-	submitting: "جاري الإرسال...",
+	featuresTitle: "بنية تحتية متكاملة لمدارس المستقبل", featuresSub: "كل ما تحتاجه الإدارة المدرسية تحت سقف رقمي واحد.",
+	f1Title: "Dox Studio للشهادات", f1Desc: "استخراج فوري لشهادات الطلاب وإشعارات الدرجات بدقة طباعة 4K متوافقة مع التنسيقات التنظيمية.",
+	f2Title: "نظام رصد أكاديمي دقيق", f2Desc: "إدارة متقدمة للمواد الدراسية، الفصول، والواجبات، مع حساب آلي للمعدلات التراكمية.",
+	f3Title: "السلوك والمواظبة", f3Desc: "توثيق دقيق لحضور الطلاب ومخالفاتهم السلوكية لضمان بيئة تعليمية منضبطة.",
+	f4Title: "إدارة أولياء الأمور", f4Desc: "ربط مباشر بين بيانات الطالب وولي أمره لتسهيل التواصل وإرسال التقارير الدورية.",
+	statsLabel1: "إجمالي المشروعات الرقمية", statsLabel2: "منظومات OPERIX الأساسية", statsLabel3: "شركاء استراتيجيين", statsLabel4: "معدل استقرار الأداء التشغيلي",
+	ctaTitle: "ابدأ رحلة الإدارة الذكية اليوم", ctaSub: "انضم إلى التحول الرقمي مع بنية OPERIX Edu التحتية المتكاملة.",
+	footerTagline: "إحدى منتجات شركة OPERIX Solutions للأنظمة الرقمية.", footerProduct: "المنتج", footerCompany: "الشركة", footerContact: "التواصل",
+	footerLinks: ["المميزات", "الأسعار", "طلب عرض", "تسجيل الدخول"], footerCompanyLinks: ["عن أوبيريكس", "الحلول", "الوظائف", "المدونة"],
+	footerRights: "© 2026 أوبيريكس سوليوشنز. جميع الحقوق محفوظة.", footerVat: "الرقم الضريبي: 310XXXXXXXXX | الرياض، المملكة العربية السعودية",
+	supportTitle: "مركز الدعم", supportSub: "نحن هنا لمساعدتك على مدار الساعة. تواصل معنا عبر أي قناة أدناه.",
+	termsTitle: "شروط الاستخدام وسياسة الخصوصية", termsEffective: "تاريخ السريان: 1 يناير 2026 | الإصدار 2.1", termsClose: "أوافق وأفهم",
+	modalTitle: "طلب عرض تجريبي", modalSub: "أدخل بيانات المدرسة وسيتواصل معك فريق الأنظمة الأكاديمية قريباً.",
+	submit: "إرسال الطلب", submitting: "جاري الإرسال...",
+	phoneLabel: "الدولة ورقم الهاتف", searchCountry: "البحث عن دولة...", phonePlaceholder: "رقم الجوال (مثال: xxxx xxx 5x)"
   }
 };
 
-// ─── TERMS DATA ───
 function getTermsSections(isAr: boolean) {
   if (isAr) return [
 	{ title: '١. القبول والموافقة على الاتفاقية', body: 'باستخدامك منصة OPERIX Edu أو الاشتراك في أي باقاتها، فإنك تقر بأنك مخوّل قانونياً للتعاقد نيابةً عن المؤسسة التعليمية التي تمثلها وتوافق على الالتزام الكامل بهذه الشروط.' },
@@ -211,7 +159,6 @@ function getTermsSections(isAr: boolean) {
   ];
 }
 
-// ─── SUPPORT MODAL ───
 function SupportModal({ t, isAr, onClose }: any) {
   const contacts = [
 	{ icon: <Mail size={18} />, label: isAr ? 'الاستفسارات العامة' : 'General Inquiries', value: 'info@operix-solutions.com', href: 'mailto:info@operix-solutions.com' },
@@ -250,7 +197,6 @@ function SupportModal({ t, isAr, onClose }: any) {
   );
 }
 
-// ─── TERMS MODAL ───
 function TermsModal({ t, isAr, onClose }: any) {
   const sections = getTermsSections(isAr);
   return (
@@ -298,6 +244,7 @@ function TermsModal({ t, isAr, onClose }: any) {
 	</div>
   );
 }
+
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const { ref, visible } = useScrollVisible();
@@ -390,8 +337,14 @@ export default function Landing() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [demoForm, setDemoForm] = useState({ name: '', email: '', school: '', students: '1-200' });
   const [scrolled, setScrolled] = useState(false);
+  
+  const [demoForm, setDemoForm] = useState({ 
+	name: '', email: '', school: '', students: '1-200',
+	country: COUNTRIES[0], phone: '' 
+  });
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
 
   const isAr = lang === 'ar';
   const t = translations[isAr ? 'ar' : 'en'];
@@ -412,14 +365,31 @@ export default function Landing() {
   const handleDemoRequest = async (e: React.FormEvent) => {
 	e.preventDefault();
 	setIsSubmitting(true);
-	const adminPayload = { action: 'sendEmail', to: TARGET_EMAIL, subject: `New EDU Lead: ${demoForm.school}`, body: `NEW OPERIX EDU DEMO REQUEST 🎓\n\nName: ${demoForm.name}\nEmail: ${demoForm.email}\nSchool: ${demoForm.school}\nStudents: ${demoForm.students}`, senderName: 'Operix Edu', senderEmail: 'system@operix.com' };
-	const userPayload = { action: 'sendEmail', to: demoForm.email, subject: `Request Confirmed - Operix Edu`, body: `Hello ${demoForm.name},\n\nThank you for your interest in Operix Edu. Our academic team has received your details for ${demoForm.school}.\n\nAn educational systems expert will reach out to you shortly.\n\nBest regards,\nThe Operix Team`, senderName: 'Operix Team', senderEmail: 'system@operix.com' };
+	
+	const adminPayload = { 
+	  action: 'sendEmail', to: TARGET_EMAIL, subject: `New EDU Lead: ${demoForm.school}`, 
+	  body: `NEW OPERIX EDU DEMO REQUEST 🎓\n\nName: ${demoForm.name}\nEmail: ${demoForm.email}\nPhone: ${demoForm.country.dial} ${demoForm.phone}\nCountry: ${demoForm.country.name}\nSchool: ${demoForm.school}\nStudents: ${demoForm.students}`, 
+	  senderName: 'Operix Edu', senderEmail: 'system@operix.com' 
+	};
+	
+	const userPayload = { 
+	  action: 'sendEmail', to: demoForm.email, subject: `Request Confirmed - Operix Edu`, 
+	  body: `Hello ${demoForm.name},\n\nThank you for your interest in Operix Edu. Our academic team has received your details for ${demoForm.school}.\n\nAn educational systems expert will reach out to you shortly.\n\nBest regards,\nThe Operix Team`, 
+	  senderName: 'Operix Team', senderEmail: 'system@operix.com' 
+	};
+	
 	await Promise.all([gasCall(adminPayload), gasCall(userPayload)]);
 	setIsSubmitting(false);
 	setShowDemoModal(false);
 	alert(isAr ? `تم الإرسال بنجاح يا ${demoForm.name}! سنتواصل معك قريباً.` : `Request sent, ${demoForm.name}! We will be in touch.`);
-	setDemoForm({ name: '', email: '', school: '', students: '1-200' });
+	setDemoForm({ name: '', email: '', school: '', students: '1-200', country: COUNTRIES[0], phone: '' });
   };
+
+  const filteredCountries = COUNTRIES.filter(c => 
+	c.name.toLowerCase().includes(countrySearch.toLowerCase()) || 
+	c.nameAr.includes(countrySearch) || 
+	c.dial.includes(countrySearch)
+  );
 
   return (
 	<div style={{ minHeight: '100vh', backgroundColor: theme.slate, direction: isAr ? 'rtl' : 'ltr', fontFamily: '"Segoe UI", system-ui, sans-serif' }}>
@@ -428,9 +398,6 @@ export default function Landing() {
 	  <header style={{ backgroundColor: scrolled ? 'rgba(255,255,255,0.95)' : theme.white, backdropFilter: scrolled ? 'blur(12px)' : 'none', borderBottom: `1px solid ${theme.border}`, padding: '14px 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, transition: 'all 0.3s ease', boxShadow: scrolled ? '0 4px 24px rgba(15,23,42,0.06)' : 'none' }}>
 		<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 		  <img src={logo} alt="OPERIX Edu" style={{ height: '38px', objectFit: 'contain' }} />
-		  <span style={{ fontSize: '1.3rem', fontWeight: 900, color: theme.navy, letterSpacing: '-0.3px' }}>
-			OPERIX <span style={{ color: theme.pencil }}>Edu</span>
-		  </span>
 		</div>
 		<nav style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
 		  {[{ label: t.navFeatures, href: '#features' }, { label: t.navVision, href: '#academic' }].map((item, i) => (
@@ -642,12 +609,13 @@ export default function Landing() {
 		</div>
 	  </footer>
 
-	  {/* ─── DEMO MODAL ─── */}
+	  {/* ─── DEMO MODAL WITH FIXED ORDER & DROPDOWN ─── */}
 	  {showDemoModal && (
 		<div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', animation: 'fadeInModal 0.2s ease' }}>
-		  <div style={{ background: theme.white, borderRadius: '20px', width: '100%', maxWidth: '480px', overflow: 'hidden', boxShadow: '0 32px 64px -12px rgba(0,0,0,0.35)', direction: isAr ? 'rtl' : 'ltr' }}>
-			<div style={{ height: '5px', background: `linear-gradient(90deg, ${theme.pencil}, ${theme.royal})` }} />
-			<div style={{ padding: '32px' }}>
+		  
+		  <div style={{ background: theme.white, borderRadius: '20px', width: '100%', maxWidth: '480px', boxShadow: '0 32px 64px -12px rgba(0,0,0,0.35)', direction: isAr ? 'rtl' : 'ltr', zIndex: 9999, position: 'relative' }}>
+			<div style={{ height: '5px', background: `linear-gradient(90deg, ${theme.pencil}, ${theme.royal})`, borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }} />
+			<div style={{ padding: '32px', maxHeight: '90vh', overflowY: 'auto' }} className="custom-scrollbar">
 			  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px' }}>
 				<div>
 				  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -658,20 +626,104 @@ export default function Landing() {
 				</div>
 				<button onClick={() => setShowDemoModal(false)} style={{ background: theme.slate, border: `1px solid ${theme.border}`, borderRadius: '10px', width: '34px', height: '34px', cursor: 'pointer', color: theme.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
 			  </div>
+			  
 			  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-				{[
-				  { label: isAr ? 'الاسم الكامل' : 'Full Name', field: 'name', type: 'text' },
-				  { label: isAr ? 'البريد الإلكتروني للإدارة' : 'Admin Email', field: 'email', type: 'email' },
-				  { label: isAr ? 'اسم المنشأة التعليمية' : 'School/Institution Name', field: 'school', type: 'text' }
-				].map(({ label, field, type }) => (
-				  <div key={field}>
-					<label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{label}</label>
-					<input type={type} style={{ width: '100%', padding: '12px 16px', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate, color: theme.navy, fontSize: '14px', boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s' }}
-					  value={(demoForm as any)[field]} onChange={e => setDemoForm({ ...demoForm, [field]: e.target.value })} required
-					  onFocus={e => e.currentTarget.style.borderColor = theme.pencil}
-					  onBlur={e => e.currentTarget.style.borderColor = theme.border} />
+				
+				{/* 1. الاسم الكامل */}
+				<div>
+				  <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{isAr ? 'الاسم الكامل' : 'Full Name'}</label>
+				  <input type="text" style={{ width: '100%', padding: '12px 16px', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate, color: theme.navy, fontSize: '14px', boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s' }}
+					value={demoForm.name} onChange={e => setDemoForm({ ...demoForm, name: e.target.value })} required
+					onFocus={e => e.currentTarget.style.borderColor = theme.pencil}
+					onBlur={e => e.currentTarget.style.borderColor = theme.border} />
+				</div>
+
+				{/* 2. الدولة ورقم الهاتف */}
+				<div>
+				  <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{isAr ? 'الدولة ورقم الهاتف' : 'Country & Phone'}</label>
+				  <div dir="ltr" style={{ position: 'relative', display: 'flex', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate }}>
+					
+					<div 
+					  onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+					  style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: '#e2e8f0', borderRight: `1px solid ${theme.border}`, borderTopLeftRadius: '8.5px', borderBottomLeftRadius: '8.5px' }}
+					>
+					  <span style={{ fontSize: '16px' }}>{demoForm.country.flag}</span>
+					  <span style={{ fontWeight: 800, color: theme.navy, fontSize: '14px' }}>{demoForm.country.dial}</span>
+					  <ChevronDown size={14} color={theme.textMuted} />
+					</div>
+
+					<input 
+					  type="tel" required
+					  placeholder={t.phonePlaceholder}
+					  value={demoForm.phone} 
+					  onChange={e => setDemoForm({ ...demoForm, phone: e.target.value.replace(/[^0-9]/g, '') })}
+					  style={{ flex: 1, padding: '12px 16px', border: 'none', background: 'transparent', outline: 'none', color: theme.navy, fontSize: '14px', fontWeight: 600, fontFamily: 'monospace' }} 
+					/>
+
+					{/* القائمة المنسدلة للبحث */}
+					{showCountryDropdown && (
+					  <>
+						{/* Invisible Backdrop for click-outside */}
+						<div 
+						  style={{ position: 'fixed', inset: 0, zIndex: 100000 }} 
+						  onClick={(e) => { e.stopPropagation(); setShowCountryDropdown(false); }} 
+						/>
+						
+						<div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: theme.white, border: `1px solid ${theme.border}`, borderRadius: '12px', marginTop: '6px', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', zIndex: 100001, overflow: 'hidden' }}>
+						  <div style={{ padding: '10px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: '8px', background: theme.slate }}>
+							<Search size={16} color={theme.textMuted} />
+							<input 
+							  autoFocus
+							  placeholder={t.searchCountry}
+							  value={countrySearch}
+							  onChange={(e) => setCountrySearch(e.target.value)}
+							  style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '13px', direction: isAr ? 'rtl' : 'ltr' }}
+							/>
+						  </div>
+						  <div style={{ maxHeight: '180px', overflowY: 'auto' }} className="custom-scrollbar">
+							{filteredCountries.length > 0 ? filteredCountries.map((c) => (
+							  <div 
+								key={c.code}
+								onMouseDown={() => { setDemoForm({ ...demoForm, country: c }); setShowCountryDropdown(false); setCountrySearch(''); }}
+								style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', borderBottom: `1px solid ${theme.border}`, direction: isAr ? 'rtl' : 'ltr' }}
+								onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'}
+								onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+							  >
+								<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+								  <span style={{ fontSize: '18px' }}>{c.flag}</span>
+								  <span style={{ fontSize: '13px', fontWeight: 600, color: theme.navy }}>{isAr ? c.nameAr : c.name}</span>
+								</div>
+								<span style={{ fontSize: '12px', fontWeight: 800, color: theme.textMuted, fontFamily: 'monospace' }} dir="ltr">{c.dial}</span>
+							  </div>
+							)) : (
+							  <div style={{ padding: '16px', textAlign: 'center', color: theme.textMuted, fontSize: '13px' }}>لا توجد نتائج</div>
+							)}
+						  </div>
+						</div>
+					  </>
+					)}
 				  </div>
-				))}
+				</div>
+
+				{/* 3. اسم المنشأة التعليمية */}
+				<div>
+				  <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{isAr ? 'اسم المنشأة التعليمية' : 'School/Institution Name'}</label>
+				  <input type="text" style={{ width: '100%', padding: '12px 16px', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate, color: theme.navy, fontSize: '14px', boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s' }}
+					value={demoForm.school} onChange={e => setDemoForm({ ...demoForm, school: e.target.value })} required
+					onFocus={e => e.currentTarget.style.borderColor = theme.pencil}
+					onBlur={e => e.currentTarget.style.borderColor = theme.border} />
+				</div>
+
+				{/* 4. البريد الإلكتروني للإدارة */}
+				<div>
+				  <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{isAr ? 'البريد الإلكتروني للإدارة' : 'Admin Email'}</label>
+				  <input type="email" style={{ width: '100%', padding: '12px 16px', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate, color: theme.navy, fontSize: '14px', boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s' }}
+					value={demoForm.email} onChange={e => setDemoForm({ ...demoForm, email: e.target.value })} required
+					onFocus={e => e.currentTarget.style.borderColor = theme.pencil}
+					onBlur={e => e.currentTarget.style.borderColor = theme.border} />
+				</div>
+
+				{/* 5. عدد الطلاب التقديري */}
 				<div>
 				  <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, marginBottom: '7px', color: theme.navy }}>{isAr ? 'عدد الطلاب التقديري' : 'Estimated Students'}</label>
 				  <select style={{ width: '100%', padding: '12px 16px', border: `1.5px solid ${theme.border}`, borderRadius: '10px', background: theme.slate, color: theme.navy, fontSize: '14px', boxSizing: 'border-box', cursor: 'pointer', fontFamily: 'inherit', outline: 'none' }} value={demoForm.students} onChange={e => setDemoForm({ ...demoForm, students: e.target.value })}>
@@ -681,8 +733,9 @@ export default function Landing() {
 					<option value="1000+">1000+ {isAr ? 'طالب' : 'Students'}</option>
 				  </select>
 				</div>
+
 				<button type="submit" onClick={handleDemoRequest} disabled={isSubmitting}
-				  style={{ width: '100%', padding: '15px', background: isSubmitting ? theme.textMuted : `linear-gradient(135deg, ${theme.pencil}, ${theme.pencilDark})`, color: theme.navy, border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 900, cursor: isSubmitting ? 'default' : 'pointer', marginTop: '4px', boxShadow: isSubmitting ? 'none' : `0 8px 24px ${theme.pencil}40`, transition: 'all 0.2s' }}>
+				  style={{ width: '100%', padding: '15px', background: isSubmitting ? theme.textMuted : `linear-gradient(135deg, ${theme.pencil}, ${theme.pencilDark})`, color: theme.white, border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 900, cursor: isSubmitting ? 'default' : 'pointer', marginTop: '4px', boxShadow: isSubmitting ? 'none' : `0 8px 24px ${theme.pencil}40`, transition: 'all 0.2s' }}>
 				  {isSubmitting ? t.submitting : t.submit}
 				</button>
 			  </div>
@@ -700,9 +753,9 @@ export default function Landing() {
 		@keyframes slideInLeft { from { opacity: 0; transform: translateX(${isAr ? '' : '-'}30px); } to { opacity: 1; transform: translateX(0); } }
 		@keyframes floatBadge { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
 		* { box-sizing: border-box; }
-		::-webkit-scrollbar { width: 6px; }
-		::-webkit-scrollbar-track { background: transparent; }
-		::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+		.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+		.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+		.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 	  `}</style>
 	</div>
   );

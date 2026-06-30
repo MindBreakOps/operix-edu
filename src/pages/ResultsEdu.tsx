@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTenant } from '../context/TenantContext';
-import { Printer, Save, Award, FileSpreadsheet } from 'lucide-react';
+import { Printer, Award } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 const theme = { navy: '#0f172a', royal: '#2563eb', slate: '#f8fafc', white: '#ffffff', border: '#e2e8f0', textDark: '#1e293b', textMuted: '#64748b' };
@@ -15,6 +15,8 @@ export default function ResultsEdu() {
 
   // Filters
   const [selectedStudent, setSelectedStudent] = useState('');
+  // New state for Term/Year selection
+  const [certPeriod, setCertPeriod] = useState('term'); 
 
   useEffect(() => {
 	const fetchData = async () => {
@@ -52,6 +54,9 @@ export default function ResultsEdu() {
 	  `;
 	}).join('');
 
+	// Dynamically set the subtitle based on user selection
+	const certSubtitle = certPeriod === 'term' ? 'الفصل الدراسي - العام الحالي' : 'نهاية العام الدراسي الحالي';
+
 	const container = document.createElement('div');
 	container.style.position = 'fixed';
 	container.style.top = '0'; container.style.left = '0';
@@ -76,12 +81,12 @@ export default function ResultsEdu() {
 
 		<div style="text-align: center; margin-bottom: 40px;">
 		  <h1 style="font-size: 36px; color: #0f172a; margin: 0; text-decoration: underline;">شهادة إشعار درجات</h1>
-		  <h3 style="font-size: 22px; color: #2563eb; margin: 10px 0 0 0;">الفصل الدراسي - العام الحالي</h3>
+		  <h3 style="font-size: 22px; color: #2563eb; margin: 10px 0 0 0;">${certSubtitle}</h3>
 		</div>
 
 		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 18px;">
 		  <strong>اسم الطالب:</strong> ${student.full_name} &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-		  <strong>المرحلة والصف:</strong> ${student.stage} - ${student.grade_level} &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+		  <strong>المرحلة والصف:</strong> ${student.stage || '---'} - ${student.grade_level || '---'} &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 		  <strong>رقم الهوية:</strong> ${student.national_id || '---'}
 		</div>
 
@@ -117,8 +122,8 @@ export default function ResultsEdu() {
 		void container.offsetHeight;
 		const config = { pixelRatio: 2, backgroundColor: '#ffffff', width: 1123, height: container.scrollHeight };
 		
-		await toPng(container, config); // Double invocation for font loading
-		const dataUrl = await toPng(container, config);
+		await toPng(container, config); // Double invocation for font loading[cite: 3]
+		const dataUrl = await toPng(container, config); //[cite: 3]
 		
 		const link = document.createElement('a');
 		link.download = `شهادة_${student.full_name.replace(/\s+/g, '_')}.png`;
@@ -136,7 +141,7 @@ export default function ResultsEdu() {
 
   const styles = {
 	btnPrimary: { backgroundColor: theme.royal, color: theme.white, border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' },
-	select: { padding: '10px 16px', borderRadius: '8px', border: `1px solid ${theme.border}`, outline: 'none', fontFamily: 'inherit', fontWeight: 800, color: theme.navy, width: '300px' }
+	select: { padding: '10px 16px', borderRadius: '8px', border: `1px solid ${theme.border}`, outline: 'none', fontFamily: 'inherit', fontWeight: 800, color: theme.navy, width: '250px' }
   };
 
   return (
@@ -144,23 +149,32 @@ export default function ResultsEdu() {
 	  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
 		<div>
 		  <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: theme.navy, margin: '0 0 8px 0' }}>النتائج و Dox Studio</h1>
-		  <p style={{ fontSize: '0.95rem', color: theme.textMuted, margin: 0 }}>نظام استخراج الشهادات وكشوف الدرجات الأكاديمية</p>
+		  <p style={{ fontSize: '0.95rem', color: theme.textMuted, margin: 0 }}>نظام استخراج الشهادات وكشوف الدرجات الأكاديمية[cite: 3]</p>
 		</div>
 	  </div>
 
 	  <div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '32px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
 		<Award size={64} color={theme.royal} style={{ marginBottom: '16px' }} />
 		<h2 style={{ color: theme.navy, margin: '0 0 16px 0' }}>أداة استخراج الشهادات (Dox Studio)</h2>
-		<p style={{ color: theme.textMuted, marginBottom: '32px' }}>الرجاء اختيار الطالب من القائمة لاستخراج وطباعة شهادته المدرسية بالهوية الرسمية.</p>
+		<p style={{ color: theme.textMuted, marginBottom: '32px' }}>الرجاء اختيار الطالب ونوع الشهادة لاستخراج وطباعة كشف الدرجات الرسمي.</p>
 		
-		<div style={{ display: 'flex', justifyContent: 'center', gap: '16px', alignItems: 'center' }}>
+		<div style={{ display: 'flex', justifyContent: 'center', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+		  
 		  <select style={styles.select} value={selectedStudent} onChange={e => setSelectedStudent(e.target.value)}>
 			<option value="">-- اختر الطالب --</option>
 			{students.map(s => <option key={s.id} value={s.id}>{s.full_name} ({s.grade_level})</option>)}
 		  </select>
+
+		  {/* New Selection for Term or Year */}
+		  <select style={styles.select} value={certPeriod} onChange={e => setCertPeriod(e.target.value)}>
+			<option value="term">شهادة فصل دراسي</option>
+			<option value="year">شهادة نهاية العام</option>
+		  </select>
+
 		  <button style={{ ...styles.btnPrimary, opacity: isExporting ? 0.7 : 1 }} onClick={() => exportCertificate(selectedStudent)} disabled={isExporting}>
 			<Printer size={18} /> {isExporting ? 'جاري تجهيز الشهادة...' : 'استخراج الشهادة'}
 		  </button>
+		  
 		</div>
 	  </div>
 	</div>
