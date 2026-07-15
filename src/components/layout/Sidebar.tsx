@@ -6,48 +6,55 @@ import {
   FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,
   Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
+// 1. IMPORT YOUR AUTH CONTEXT
+import { useAuth } from '../../context/AuthContext'; 
 
 type IconType = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
 
 export interface PageIndexEntry {
-  key: string;        // المسار النسبي داخل البوابة، مثال: 'finance/fees'
+  key: string;
   label: string;
   icon: IconType;
   group: string;
-  keywords: string[]; // مرادفات لدعم البحث الذكي
+  keywords: string[];
+  // 2. ADD ALLOWED ROLES TO THE INTERFACE
+  allowedRoles?: string[]; 
 }
 
-// سجلّ الصفحات الموحّد — يُبنى منه كل من قائمة الشريط الجانبي ومحرك بحث الشريط العلوي
-// (مطابق لمسارات App.tsx بما في ذلك صفحات المالية التي لم تكن ظاهرة سابقًا في القائمة)
+// 3. DEFINE YOUR ROLE UUIDS
+const ADMIN = '16c63ddf-3059-4d8d-9c9d-1c56f263bee6';
+const TEACHER = 'b11a322b-749e-45f5-ba33-d395212bed9b';
+const ACCOUNTANT = '7b4e1424-b3e8-48ab-8425-26cc4cbd8042';
+
+// 4. ASSIGN ROLES TO PAGES
 export const PAGE_INDEX: PageIndexEntry[] = [
-  { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard', 'home', 'رئيسية'] },
+  { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT] },
 
-  { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student', 'طالب', 'طلاب'] },
-  { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent', 'ولي', 'أمر'] },
-  { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher', 'معلم', 'معلمين'] },
+  { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT] },
+  { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher'], allowedRoles: [ADMIN] },
 
-  { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance', 'حضور', 'غياب'] },
-  { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable', 'schedule', 'جدول', 'حصص'] },
-  { key: 'behavior', label: 'السلوك والمواظبة', icon: Activity, group: 'الشؤون الأكاديمية', keywords: ['behavior', 'سلوك', 'مواظبة'] },
-  { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject', 'مواد', 'منهج'] },
-  { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment', 'homework', 'واجب'] },
-  { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results', 'grades', 'نتائج', 'درجات'] },
+  { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'behavior', label: 'السلوك والمواظبة', icon: Activity, group: 'الشؤون الأكاديمية', keywords: ['behavior'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results'], allowedRoles: [ADMIN, TEACHER] },
 
-  { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event', 'فعالية', 'نشاط'] },
+  { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event'], allowedRoles: [ADMIN, TEACHER] },
 
-  { key: 'finance/fees', label: 'الرسوم الدراسية', icon: Wallet, group: 'الإدارة والمالية', keywords: ['fees', 'رسوم', 'دفع'] },
-  { key: 'finance/salaries', label: 'الرواتب', icon: Landmark, group: 'الإدارة والمالية', keywords: ['salary', 'راتب', 'رواتب'] },
-  { key: 'finance/debts', label: 'المديونيات', icon: Receipt, group: 'الإدارة والمالية', keywords: ['debt', 'ديون', 'مديونية'] },
-  { key: 'finance/logistics', label: 'اللوجستيات', icon: Package, group: 'الإدارة والمالية', keywords: ['logistics', 'لوجستيات', 'مخزون'] },
-  { key: 'finance/transportation', label: 'النقل المدرسي', icon: Bus, group: 'الإدارة والمالية', keywords: ['transportation', 'نقل', 'باص', 'حافلة'] },
-  { key: 'finance/kindergarten', label: 'مالية رياض الأطفال', icon: Landmark, group: 'الإدارة والمالية', keywords: ['kindergarten', 'رياض أطفال', 'حضانة'] },
-  { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services', 'خدمات خاصة', 'دعم'] },
+  { key: 'finance/fees', label: 'الرسوم الدراسية', icon: Wallet, group: 'الإدارة والمالية', keywords: ['fees'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/salaries', label: 'الرواتب', icon: Landmark, group: 'الإدارة والمالية', keywords: ['salary'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/debts', label: 'المديونيات', icon: Receipt, group: 'الإدارة والمالية', keywords: ['debt'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/logistics', label: 'اللوجستيات', icon: Package, group: 'الإدارة والمالية', keywords: ['logistics'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/transportation', label: 'النقل المدرسي', icon: Bus, group: 'الإدارة والمالية', keywords: ['transportation'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/kindergarten', label: 'مالية رياض الأطفال', icon: Landmark, group: 'الإدارة والمالية', keywords: ['kindergarten'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services'], allowedRoles: [ADMIN, ACCOUNTANT] },
 
-  { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox', 'studio', 'مستندات', 'تحرير'] },
-  { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings', 'إعدادات', 'ضبط'] },
+  { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox'], allowedRoles: [ADMIN] },
+  { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings'], allowedRoles: [ADMIN] },
 ];
 
-// خريطة تسمية سريعة تُستخدم في مسار التنقل (Breadcrumbs) بالشريط العلوي
 export const NAV_LABELS: Record<string, string> = PAGE_INDEX.reduce((acc, p) => {
   const lastSegment = p.key.split('/').pop() as string;
   acc[lastSegment] = p.label;
@@ -68,6 +75,10 @@ export default function Sidebar() {
   const activePortal = portalType || 'elementary';
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // 5. GET THE USER'S ROLE FROM METADATA
+  const { user } = useAuth();
+  const userRole = user?.user_metadata?.role_id || ADMIN; 
 
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Set<number>>(new Set([0]));
@@ -87,25 +98,29 @@ export default function Sidebar() {
 	navigate(`/app/${portal}/${currentSubPage}`);
   };
 
+  // 6. FILTER THE MENU BASED ON THE USER'S ROLE
   const navGroups = useMemo(() => (
-	GROUP_ORDER.map((title) => ({
-	  title,
-	  items: PAGE_INDEX
+	GROUP_ORDER.map((title) => {
+	  const filteredItems = PAGE_INDEX
 		.filter((p) => p.group === title)
-		.map((p) => ({ name: p.label, path: `/app/${activePortal}/${p.key}`, icon: p.icon })),
-	}))
-  ), [activePortal]);
+		.filter((p) => !p.allowedRoles || p.allowedRoles.includes(userRole)) // The magic filter!
+		.map((p) => ({ name: p.label, path: `/app/${activePortal}/${p.key}`, icon: p.icon }));
+		
+	  return { title, items: filteredItems };
+	}).filter(group => group.items.length > 0) // Hide empty groups
+  ), [activePortal, userRole]);
 
   const isActive = (path: string) =>
 	location.pathname === path || location.pathname.startsWith(path + '/');
 
-  // يفتح تلقائيًا المجموعة التي تحتوي على المسار النشط عند تغيّر الصفحة
   useEffect(() => {
 	const idx = navGroups.findIndex((g) => g.items.some((it) => isActive(it.path)));
 	if (idx !== -1) {
 	  setOpenGroups((prev) => (prev.has(idx) ? prev : new Set(prev).add(idx)));
 	}
   }, [location.pathname, navGroups]);
+
+  
 
   return (
 	<>
