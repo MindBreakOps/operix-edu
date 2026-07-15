@@ -76,7 +76,7 @@ const translations: Record<string, any> = {
 	currencySAR: "SAR",
 	currencyUSD: "USD",
 	vatNote: "All prices exclude 15% VAT. Fully compliant with ZATCA Fatoorah Phase 1 & 2.",
-	usdNote: "International pricing. Local taxes may apply per jurisdiction.",
+	USDNote: "International pricing. Local taxes may apply per jurisdiction.",
 	popular: "Most Popular",
 	startBtn: "Get Started",
 	demoBtn: "Request Custom Quote",
@@ -110,7 +110,7 @@ const translations: Record<string, any> = {
 	currencySAR: "ر.س",
 	currencyUSD: "دولار",
 	vatNote: "الأسعار لا تشمل ضريبة القيمة المضافة 15%. النظام متوافق كلياً مع متطلبات هيئة الزكاة والضريبة (فاتورة المرحلة الأولى والثانية).",
-	usdNote: "تسعير دولي. قد تُطبق الضرائب المحلية حسب دولتك.",
+	USDNote: "تسعير دولي. قد تُطبق الضرائب المحلية حسب دولتك.",
 	popular: "الأكثر طلباً",
 	startBtn: "ابدأ الآن",
 	demoBtn: "طلب عرض سعر خاص",
@@ -479,7 +479,7 @@ export default function SubscriptionsEdu() {
 	  <div style={{ textAlign: 'center', padding: '0 5% 60px' }}>
 		<div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', background: '#eff6ff', color: theme.navy, padding: '16px 24px', borderRadius: '14px', border: `1.5px solid #bfdbfe`, maxWidth: '700px', flexWrap: 'wrap', justifyContent: 'center' }}>
 		  <ShieldCheck color={theme.royal} size={20} />
-		  <span style={{ fontWeight: 700, fontSize: '0.9rem', textAlign: 'center' }}>{currency === 'SAR' ? t.vatNote : t.usdNote}</span>
+		  <span style={{ fontWeight: 700, fontSize: '0.9rem', textAlign: 'center' }}>{currency === 'SAR' ? t.vatNote : t.USDNote}</span>
 		</div>
 	  </div>
 

@@ -1,7 +1,29 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { TenantProvider } from './context/TenantContext';
+
+// النطاق الفرعي المخصص لتطبيق المعلمين (PWA)
+// أي زيارة لهذا النطاق يتم توجيهها تلقائياً إلى /teacher-app بغض النظر عن المسار المطلوب
+const TEACHER_APP_HOST = 'teacher.operix-solutions.online';
+
+const HostRedirect = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isTeacherHost = window.location.hostname === TEACHER_APP_HOST;
+    const alreadyInTeacherApp = location.pathname.startsWith('/teacher-app');
+
+    if (isTeacherHost && !alreadyInTeacherApp) {
+      const remainder = location.pathname === '/' ? '' : location.pathname;
+      navigate(`/teacher-app${remainder}${location.search}`, { replace: true });
+    }
+  }, [location.pathname, location.search, navigate]);
+
+  return null;
+};
 
 // --- Layouts & Guards ---
 import SubscriptionGuard from './components/layout/SubscriptionGuard';
@@ -64,6 +86,7 @@ export default function App() {
     <AuthProvider>
       <TenantProvider>
         <BrowserRouter>
+          <HostRedirect />
           <Routes>
             {/* =========================================
                 1. PUBLIC ROUTES (بدون حماية)

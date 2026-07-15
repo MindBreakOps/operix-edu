@@ -1,8 +1,11 @@
 {
   "rewrites": [
 	{
-	  "source": "/(.*)",
-	  "destination": "/"
+	  "source": "/",
+	  "has": [
+		{ "type": "host", "value": "teacher.operix-solutions.online" }
+	  ],
+	  "destination": "/teacher-app"
 	}
   ]
 }
