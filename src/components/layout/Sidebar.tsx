@@ -6,7 +6,6 @@ import {
   FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,
   Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
-// 1. IMPORT YOUR AUTH CONTEXT
 import { useAuth } from '../../context/AuthContext'; 
 
 type IconType = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
@@ -17,42 +16,42 @@ export interface PageIndexEntry {
   icon: IconType;
   group: string;
   keywords: string[];
-  // 2. ADD ALLOWED ROLES TO THE INTERFACE
   allowedRoles?: string[]; 
+  // 1. Add a color property for the alive icons
+  color: string; 
 }
 
-// 3. DEFINE YOUR ROLE UUIDS
 const ADMIN = '16c63ddf-3059-4d8d-9c9d-1c56f263bee6';
 const TEACHER = 'b11a322b-749e-45f5-ba33-d395212bed9b';
 const ACCOUNTANT = '7b4e1424-b3e8-48ab-8425-26cc4cbd8042';
 
-// 4. ASSIGN ROLES TO PAGES
+// 2. Assign vibrant colors to each page entry
 export const PAGE_INDEX: PageIndexEntry[] = [
-  { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT] },
+  { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT], color: '#3b82f6' },
 
-  { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT] },
-  { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher'], allowedRoles: [ADMIN] },
+  { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT], color: '#10b981' },
+  { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#8b5cf6' },
+  { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher'], allowedRoles: [ADMIN], color: '#f59e0b' },
 
-  { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance'], allowedRoles: [ADMIN, TEACHER] },
-  { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable'], allowedRoles: [ADMIN, TEACHER] },
-  { key: 'behavior', label: 'السلوك والمواظبة', icon: Activity, group: 'الشؤون الأكاديمية', keywords: ['behavior'], allowedRoles: [ADMIN, TEACHER] },
-  { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject'], allowedRoles: [ADMIN, TEACHER] },
-  { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment'], allowedRoles: [ADMIN, TEACHER] },
-  { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance'], allowedRoles: [ADMIN, TEACHER], color: '#ec4899' },
+  { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable'], allowedRoles: [ADMIN, TEACHER], color: '#8b5cf6' },
+  { key: 'behavior', label: 'السلوك والمواظبة', icon: Activity, group: 'الشؤون الأكاديمية', keywords: ['behavior'], allowedRoles: [ADMIN, TEACHER], color: '#ef4444' },
+  { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject'], allowedRoles: [ADMIN, TEACHER], color: '#06b6d4' },
+  { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment'], allowedRoles: [ADMIN, TEACHER], color: '#f97316' },
+  { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results'], allowedRoles: [ADMIN, TEACHER], color: '#14b8a6' },
 
-  { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event'], allowedRoles: [ADMIN, TEACHER] },
+  { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event'], allowedRoles: [ADMIN, TEACHER], color: '#d946ef' },
 
-  { key: 'finance/fees', label: 'الرسوم الدراسية', icon: Wallet, group: 'الإدارة والمالية', keywords: ['fees'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/salaries', label: 'الرواتب', icon: Landmark, group: 'الإدارة والمالية', keywords: ['salary'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/debts', label: 'المديونيات', icon: Receipt, group: 'الإدارة والمالية', keywords: ['debt'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/logistics', label: 'اللوجستيات', icon: Package, group: 'الإدارة والمالية', keywords: ['logistics'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/transportation', label: 'النقل المدرسي', icon: Bus, group: 'الإدارة والمالية', keywords: ['transportation'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/kindergarten', label: 'مالية رياض الأطفال', icon: Landmark, group: 'الإدارة والمالية', keywords: ['kindergarten'], allowedRoles: [ADMIN, ACCOUNTANT] },
-  { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services'], allowedRoles: [ADMIN, ACCOUNTANT] },
+  { key: 'finance/fees', label: 'الرسوم الدراسية', icon: Wallet, group: 'الإدارة والمالية', keywords: ['fees'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#10b981' },
+  { key: 'finance/salaries', label: 'الرواتب', icon: Landmark, group: 'الإدارة والمالية', keywords: ['salary'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#3b82f6' },
+  { key: 'finance/debts', label: 'المديونيات', icon: Receipt, group: 'الإدارة والمالية', keywords: ['debt'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#f43f5e' },
+  { key: 'finance/logistics', label: 'اللوجستيات', icon: Package, group: 'الإدارة والمالية', keywords: ['logistics'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#8b5cf6' },
+  { key: 'finance/transportation', label: 'النقل المدرسي', icon: Bus, group: 'الإدارة والمالية', keywords: ['transportation'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#eab308' },
+  { key: 'finance/kindergarten', label: 'مالية رياض الأطفال', icon: Landmark, group: 'الإدارة والمالية', keywords: ['kindergarten'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#ec4899' },
+  { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#0ea5e9' },
 
-  { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox'], allowedRoles: [ADMIN] },
-  { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings'], allowedRoles: [ADMIN] },
+  { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox'], allowedRoles: [ADMIN], color: '#f59e0b' },
+  { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings'], allowedRoles: [ADMIN], color: '#94a3b8' },
 ];
 
 export const NAV_LABELS: Record<string, string> = PAGE_INDEX.reduce((acc, p) => {
@@ -76,7 +75,6 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 5. GET THE USER'S ROLE FROM METADATA
   const { user } = useAuth();
   const userRole = user?.user_metadata?.role_id || ADMIN; 
 
@@ -98,16 +96,15 @@ export default function Sidebar() {
 	navigate(`/app/${portal}/${currentSubPage}`);
   };
 
-  // 6. FILTER THE MENU BASED ON THE USER'S ROLE
   const navGroups = useMemo(() => (
 	GROUP_ORDER.map((title) => {
 	  const filteredItems = PAGE_INDEX
 		.filter((p) => p.group === title)
-		.filter((p) => !p.allowedRoles || p.allowedRoles.includes(userRole)) // The magic filter!
-		.map((p) => ({ name: p.label, path: `/app/${activePortal}/${p.key}`, icon: p.icon }));
+		.filter((p) => !p.allowedRoles || p.allowedRoles.includes(userRole))
+		.map((p) => ({ name: p.label, path: `/app/${activePortal}/${p.key}`, icon: p.icon, color: p.color }));
 		
 	  return { title, items: filteredItems };
-	}).filter(group => group.items.length > 0) // Hide empty groups
+	}).filter(group => group.items.length > 0)
   ), [activePortal, userRole]);
 
   const isActive = (path: string) =>
@@ -120,11 +117,10 @@ export default function Sidebar() {
 	}
   }, [location.pathname, navGroups]);
 
-  
-
   return (
 	<>
 	  <style>{`
+		/* 3. Updated styles for brightness, size, and animations */
 		.sidebar-nav-link {
 		  display: flex;
 		  align-items: center;
@@ -132,40 +128,54 @@ export default function Sidebar() {
 		  padding: 10px 14px;
 		  border-radius: 9px;
 		  text-decoration: none;
-		  color: #9aa7c2;
+		  color: #cbd5e1; /* Brighter text color */
 		  font-weight: 600;
-		  font-size: 0.92rem;
-		  transition: background-color 0.15s ease, color 0.15s ease;
+		  font-size: 1.02rem; /* Increased font size */
+		  transition: background-color 0.2s ease, color 0.2s ease;
 		  border-right: 3px solid transparent;
 		  position: relative;
 		  white-space: nowrap;
 		}
 		.sidebar-nav-link:hover {
-		  background-color: rgba(79, 125, 243, 0.08);
-		  color: #e7ebf5;
+		  background-color: rgba(255, 255, 255, 0.05);
+		  color: #ffffff; /* Max brightness on hover */
 		}
 		.sidebar-nav-link.active {
 		  background-color: rgba(79, 125, 243, 0.14);
-		  color: var(--color-royal, #4f7df3);
+		  color: #ffffff;
 		  font-weight: 800;
-		  border-right: 3px solid var(--color-royal, #4f7df3);
+		  border-right: 3px solid var(--icon-color, #4f7df3);
 		}
-		.sidebar-nav-link svg { flex-shrink: 0; }
+		
+		/* The magic for making icons alive */
+		.sidebar-nav-link svg { 
+		  flex-shrink: 0; 
+		  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+		  color: #94a3b8; /* Default inactive color */
+		}
+		.sidebar-nav-link:hover svg {
+		  color: var(--icon-color);
+		  transform: scale(1.18) rotate(4deg); /* Bounce and scale */
+		}
+		.sidebar-nav-link.active svg {
+		  color: var(--icon-color);
+		  transform: scale(1.1);
+		}
 
 		.sidebar-group-toggle {
 		  display: flex; align-items: center; justify-content: space-between;
 		  width: 100%; background: none; border: none; cursor: pointer;
-		  padding: 6px 14px 8px 14px; color: #5c6a8a;
-		  font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+		  padding: 6px 14px 8px 14px; color: #64748b; /* Brighter group text */
+		  font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
 		  letter-spacing: 0.06em;
 		}
 		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #445071; }
-		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #4f7df3; }
+		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #cbd5e1; }
 
 		.sidebar-group-items {
-		  display: flex; flex-direction: column; gap: 2px;
+		  display: flex; flex-direction: column; gap: 4px; /* Increased gap slightly */
 		  max-height: 0; overflow: hidden;
-		  transition: max-height 0.25s ease;
+		  transition: max-height 0.3s ease-in-out;
 		}
 		.sidebar-group-items.open { max-height: 700px; }
 
@@ -245,7 +255,11 @@ export default function Sidebar() {
 					  key={link.path}
 					  to={link.path}
 					  className={`sidebar-nav-link ${active ? 'active' : ''}`}
-					  style={collapsed ? { justifyContent: 'center', padding: '13px' } : undefined}
+					  // 4. Inject the color variable dynamically so CSS can use it on hover
+					  style={{ 
+						...(collapsed ? { justifyContent: 'center', padding: '13px' } : {}),
+						'--icon-color': link.color 
+					  } as React.CSSProperties}
 					>
 					  <link.icon size={22} />
 					  {!collapsed && <span>{link.name}</span>}
@@ -322,7 +336,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 	backgroundColor: '#182238',
 	color: '#e7ebf5',
 	fontWeight: 700,
-	fontSize: '0.88rem',
+	fontSize: '0.95rem', /* Slightly increased portal switcher font */
 	appearance: 'none',
 	cursor: 'pointer',
 	outline: 'none',
@@ -339,5 +353,5 @@ const styles: { [key: string]: React.CSSProperties } = {
   footer: {
 	padding: '16px 22px', borderTop: '1px solid #1e2a45',
   },
-  footerText: { fontSize: '0.72rem', color: '#5c6a8a', fontWeight: 600 },
+  footerText: { fontSize: '0.75rem', color: '#64748b', fontWeight: 600 },
 };
