@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, GraduationCap,
   CalendarDays, TableProperties, Activity, BookOpen, Book,
   FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,
-  Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight
+  Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight, FileText
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; 
 
@@ -17,7 +17,6 @@ export interface PageIndexEntry {
   group: string;
   keywords: string[];
   allowedRoles?: string[]; 
-  // 1. Add a color property for the alive icons
   color: string; 
 }
 
@@ -25,7 +24,6 @@ const ADMIN = '16c63ddf-3059-4d8d-9c9d-1c56f263bee6';
 const TEACHER = 'b11a322b-749e-45f5-ba33-d395212bed9b';
 const ACCOUNTANT = '7b4e1424-b3e8-48ab-8425-26cc4cbd8042';
 
-// 2. Assign vibrant colors to each page entry
 export const PAGE_INDEX: PageIndexEntry[] = [
   { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT], color: '#3b82f6' },
 
@@ -39,6 +37,8 @@ export const PAGE_INDEX: PageIndexEntry[] = [
   { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject'], allowedRoles: [ADMIN, TEACHER], color: '#06b6d4' },
   { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment'], allowedRoles: [ADMIN, TEACHER], color: '#f97316' },
   { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results'], allowedRoles: [ADMIN, TEACHER], color: '#14b8a6' },
+  
+  { key: 'examinations', label: 'الاختبارات والنماذج', icon: FileText, group: 'الشؤون الأكاديمية', keywords: ['exams', 'tests'], allowedRoles: [ADMIN, TEACHER], color: '#f43f5e' },
 
   { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event'], allowedRoles: [ADMIN, TEACHER], color: '#d946ef' },
 
@@ -74,7 +74,7 @@ export default function Sidebar() {
   const activePortal = portalType || 'elementary';
   const navigate = useNavigate();
   const location = useLocation();
-  
+ 
   const { user } = useAuth();
   const userRole = user?.user_metadata?.role_id || ADMIN; 
 
@@ -120,7 +120,6 @@ export default function Sidebar() {
   return (
 	<>
 	  <style>{`
-		/* 3. Updated styles for brightness, size, and animations */
 		.sidebar-nav-link {
 		  display: flex;
 		  align-items: center;
@@ -128,9 +127,9 @@ export default function Sidebar() {
 		  padding: 10px 14px;
 		  border-radius: 9px;
 		  text-decoration: none;
-		  color: #cbd5e1; /* Brighter text color */
+		  color: #cbd5e1;
 		  font-weight: 600;
-		  font-size: 1.02rem; /* Increased font size */
+		  font-size: 1.02rem;
 		  transition: background-color 0.2s ease, color 0.2s ease;
 		  border-right: 3px solid transparent;
 		  position: relative;
@@ -138,7 +137,7 @@ export default function Sidebar() {
 		}
 		.sidebar-nav-link:hover {
 		  background-color: rgba(255, 255, 255, 0.05);
-		  color: #ffffff; /* Max brightness on hover */
+		  color: #ffffff;
 		}
 		.sidebar-nav-link.active {
 		  background-color: rgba(79, 125, 243, 0.14);
@@ -147,15 +146,14 @@ export default function Sidebar() {
 		  border-right: 3px solid var(--icon-color, #4f7df3);
 		}
 		
-		/* The magic for making icons alive */
 		.sidebar-nav-link svg { 
 		  flex-shrink: 0; 
 		  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
-		  color: #94a3b8; /* Default inactive color */
+		  color: #94a3b8; 
 		}
 		.sidebar-nav-link:hover svg {
 		  color: var(--icon-color);
-		  transform: scale(1.18) rotate(4deg); /* Bounce and scale */
+		  transform: scale(1.18) rotate(4deg);
 		}
 		.sidebar-nav-link.active svg {
 		  color: var(--icon-color);
@@ -165,15 +163,15 @@ export default function Sidebar() {
 		.sidebar-group-toggle {
 		  display: flex; align-items: center; justify-content: space-between;
 		  width: 100%; background: none; border: none; cursor: pointer;
-		  padding: 6px 14px 8px 14px; color: #64748b; /* Brighter group text */
-		  font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+		  padding: 6px 14px 8px 14px; color: #ffffff; /* Bright White */
+		  font-size: 0.95rem; font-weight: 800; text-transform: uppercase; /* Increased font size */
 		  letter-spacing: 0.06em;
 		}
-		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #445071; }
-		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #cbd5e1; }
+		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #ffffff; }
+		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #ffffff; }
 
 		.sidebar-group-items {
-		  display: flex; flex-direction: column; gap: 4px; /* Increased gap slightly */
+		  display: flex; flex-direction: column; gap: 4px;
 		  max-height: 0; overflow: hidden;
 		  transition: max-height 0.3s ease-in-out;
 		}
@@ -255,7 +253,6 @@ export default function Sidebar() {
 					  key={link.path}
 					  to={link.path}
 					  className={`sidebar-nav-link ${active ? 'active' : ''}`}
-					  // 4. Inject the color variable dynamically so CSS can use it on hover
 					  style={{ 
 						...(collapsed ? { justifyContent: 'center', padding: '13px' } : {}),
 						'--icon-color': link.color 
@@ -336,7 +333,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 	backgroundColor: '#182238',
 	color: '#e7ebf5',
 	fontWeight: 700,
-	fontSize: '0.95rem', /* Slightly increased portal switcher font */
+	fontSize: '0.95rem', 
 	appearance: 'none',
 	cursor: 'pointer',
 	outline: 'none',

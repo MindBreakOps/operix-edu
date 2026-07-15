@@ -2,61 +2,102 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useTenant } from '../../context/TenantContext';
-import { Search, Printer, Plus, Edit, UsersRound } from 'lucide-react';
+import { Search, Printer, Plus, Edit, UsersRound, Link as LinkIcon } from 'lucide-react';
 
 export default function ParentsEdu() {
   const { workspace } = useTenant();
   const { portalType } = useParams<{ portalType: string }>();
   
   const [guardians, setGuardians] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ full_name: '', phone: '', national_id: '', relation: 'أب' });
+  
+  // Aligned strictly with the public.guardians_edu schema
+  const [formData, setFormData] = useState({ full_name: '', phone_number: '', email: '' });
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 
   useEffect(() => {
-	const fetchGuardians = async () => {
+	const fetchData = async () => {
 	  if (!workspace || !portalType) return;
 	  setIsLoading(true);
 	  
-	  // Strict Data Isolation: Filter by Workspace AND Portal Type
-	  let query = supabase
-		.from('guardians_edu')
-		.select('*')
-		.eq('workspace_id', workspace.id)
-		.order('full_name');
-
-	  if (searchTerm.trim()) {
-		query = query.or(`full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`).limit(20);
-	  } else {
-		query = query.limit(15);
+	  // 1. Fetch REAL Students mapped to this portal_type
+	  try {
+		const { data: studentsData } = await supabase
+		  .from('students_edu')
+		  .select('id, full_name, guardian_id')
+		  .eq('workspace_id', workspace.id)
+		  .eq('portal_type', portalType)
+		  .order('full_name');
+		  
+		setStudents(studentsData || []);
+	  } catch (err) {
+		console.error("Error fetching students:", err);
 	  }
 
-	  const { data, error } = await query;
-	  if (!error && data) setGuardians(data);
+	  // 2. Fetch guardians and join their children using the foreign key
+	  try {
+		let query = supabase
+		  .from('guardians_edu')
+		  .select('*, children:students_edu(id, full_name)')
+		  .eq('workspace_id', workspace.id)
+		  .order('full_name');
+
+		if (searchTerm.trim()) {
+		  query = query.or(`full_name.ilike.%${searchTerm}%,phone_number.ilike.%${searchTerm}%`).limit(20);
+		} else {
+		  query = query.limit(15);
+		}
+
+		const { data: guardiansData, error } = await query;
+		if (!error && guardiansData) setGuardians(guardiansData);
+	  } catch (err) {
+		console.error("Error fetching guardians:", err);
+	  }
+	  
 	  setIsLoading(false);
 	};
 
-	const delay = setTimeout(() => fetchGuardians(), 500);
+	const delay = setTimeout(() => fetchData(), 500);
 	return () => clearTimeout(delay);
   }, [searchTerm, workspace, portalType]);
 
   const handleSave = async (e: React.FormEvent) => {
 	e.preventDefault();
+	
+	// Construct payload mapped exactly to guardians_edu columns
 	const payload = { 
-	  ...formData, 
+	  full_name: formData.full_name,
+	  phone_number: formData.phone_number,
+	  email: formData.email,
 	  workspace_id: workspace?.id,
-	  // Note: Guardians might span multiple portals if they have kids in different stages. 
-	  // For strict isolation per your request, we can tag the entry, or manage via a junction table later.
 	};
 
+	let savedGuardianId = editingId;
+
+	// 1. Save or Update the Guardian
 	if (editingId) {
 	  await supabase.from('guardians_edu').update(payload).eq('id', editingId);
 	} else {
-	  await supabase.from('guardians_edu').insert([payload]);
+	  const { data } = await supabase.from('guardians_edu').insert([payload]).select('id').single();
+	  if (data) savedGuardianId = data.id;
 	}
+
+	// 2. Update the linked students in students_edu
+	if (savedGuardianId) {
+	  // Detach any students currently linked to this guardian
+	  await supabase.from('students_edu').update({ guardian_id: null }).eq('guardian_id', savedGuardianId);
+	  
+	  // Attach the newly selected students
+	  if (selectedStudentIds.length > 0) {
+		await supabase.from('students_edu').update({ guardian_id: savedGuardianId }).in('id', selectedStudentIds);
+	  }
+	}
+
 	setIsModalOpen(false);
 	setSearchTerm(''); 
   };
@@ -65,16 +106,25 @@ export default function ParentsEdu() {
 	if (guardian) {
 	  setEditingId(guardian.id);
 	  setFormData({ 
-		full_name: guardian.full_name, 
-		phone: guardian.phone_number || guardian.phone || '', // Adapting to schema variations
-		national_id: guardian.national_id || '', 
-		relation: guardian.relation || 'أب' 
+		full_name: guardian.full_name || '', 
+		phone_number: guardian.phone_number || '', 
+		email: guardian.email || '' 
 	  });
+	  setSelectedStudentIds(guardian.children?.map((c: any) => c.id) || []);
 	} else {
 	  setEditingId(null);
-	  setFormData({ full_name: '', phone: '', national_id: '', relation: 'أب' });
+	  setFormData({ full_name: '', phone_number: '', email: '' });
+	  setSelectedStudentIds([]);
 	}
 	setIsModalOpen(true);
+  };
+
+  const toggleStudentSelection = (studentId: string) => {
+	if (selectedStudentIds.includes(studentId)) {
+	  setSelectedStudentIds(selectedStudentIds.filter(id => id !== studentId));
+	} else {
+	  setSelectedStudentIds([...selectedStudentIds, studentId]);
+	}
   };
 
   return (
@@ -117,9 +167,9 @@ export default function ParentsEdu() {
 			<thead>
 			  <tr>
 				<th style={styles.th}>الاسم الرباعي</th>
-				<th style={styles.th}>صلة القرابة</th>
 				<th style={styles.th}>رقم الجوال</th>
-				<th style={styles.th}>رقم الهوية</th>
+				<th style={styles.th}>البريد الإلكتروني</th>
+				<th style={styles.th}>الأبناء المرتبطين</th>
 				<th className="no-print" style={styles.th}>إجراءات</th>
 			  </tr>
 			</thead>
@@ -134,13 +184,21 @@ export default function ParentsEdu() {
 					  {g.full_name}
 					</div>
 				  </td>
+				  <td style={{ ...styles.td, fontFamily: 'monospace' }} dir="ltr">{g.phone_number || '—'}</td>
+				  <td style={styles.td}>{g.email || '—'}</td>
 				  <td style={styles.td}>
-					<span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
-					  {g.relation || 'أب'}
-					</span>
+					{g.children && g.children.length > 0 ? (
+					  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+						{g.children.map((child: any) => (
+						  <span key={child.id} style={{ backgroundColor: '#f1f5f9', color: 'var(--color-navy)', padding: '4px 8px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+							<LinkIcon size={12} /> {child.full_name}
+						  </span>
+						))}
+					  </div>
+					) : (
+					  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>لا يوجد أبناء مرتبطين</span>
+					)}
 				  </td>
-				  <td style={{ ...styles.td, fontFamily: 'monospace' }} dir="ltr">{g.phone || g.phone_number}</td>
-				  <td style={{ ...styles.td, fontFamily: 'monospace' }}>{g.national_id || '—'}</td>
 				  <td className="no-print" style={styles.td}>
 					<button onClick={() => openModal(g)} style={{ background: 'none', border: 'none', color: 'var(--color-royal)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
 					  <Edit size={14} /> تعديل
@@ -175,22 +233,50 @@ export default function ParentsEdu() {
 			  <div style={{ display: 'flex', gap: '16px' }}>
 				<div style={{ ...styles.inputGroup, flex: 1 }}>
 				  <label style={styles.label}>رقم الجوال</label>
-				  <input required type="tel" dir="ltr" style={styles.input} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+966..." />
+				  <input required type="tel" dir="ltr" style={styles.input} value={formData.phone_number} onChange={e => setFormData({...formData, phone_number: e.target.value})} placeholder="+966..." />
 				</div>
 				<div style={{ ...styles.inputGroup, flex: 1 }}>
-				  <label style={styles.label}>رقم الهوية</label>
-				  <input style={styles.input} value={formData.national_id} onChange={e => setFormData({...formData, national_id: e.target.value})} />
+				  <label style={styles.label}>البريد الإلكتروني</label>
+				  <input type="email" style={styles.input} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} dir="ltr" placeholder="email@example.com" />
 				</div>
 			  </div>
-			  
+
+			  {/* ─── REAL STUDENT SELECTOR ─── */}
 			  <div style={styles.inputGroup}>
-				<label style={styles.label}>صلة القرابة</label>
-				<select style={styles.input} value={formData.relation} onChange={e => setFormData({...formData, relation: e.target.value})}>
-				  <option>أب</option>
-				  <option>أم</option>
-				  <option>أخ</option>
-				  <option>أخرى</option>
-				</select>
+				<label style={styles.label}>ربط الأبناء (الطلاب)</label>
+				<div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '12px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+				  {students.length === 0 ? (
+					<p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem', margin: '10px 0', fontWeight: 600 }}>لا يوجد طلاب متاحين في هذه البوابة. قم بإضافة طلاب أولاً.</p>
+				  ) : (
+					students.map(s => {
+					  const isSelected = selectedStudentIds.includes(s.id);
+					  return (
+						<label 
+						  key={s.id} 
+						  style={{ 
+							display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', cursor: 'pointer', 
+							backgroundColor: isSelected ? '#e0e7ff' : '#ffffff', 
+							border: `1px solid ${isSelected ? '#818cf8' : '#e2e8f0'}`,
+							borderRadius: '8px', transition: 'all 0.2s' 
+						  }}
+						>
+						  <input 
+							type="checkbox" 
+							checked={isSelected}
+							onChange={() => toggleStudentSelection(s.id)}
+							style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--color-royal)' }}
+						  />
+						  <span style={{ fontSize: '0.95rem', fontWeight: isSelected ? 800 : 600, color: isSelected ? '#3730a3' : 'var(--color-navy)' }}>
+							{s.full_name}
+						  </span>
+						</label>
+					  );
+					})
+				  )}
+				</div>
+				<span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600, marginTop: '4px' }}>
+				  اختر الطلاب المرتبطين بولي الأمر هذا لتسهيل المتابعة.
+				</span>
 			  </div>
 
 			  <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
