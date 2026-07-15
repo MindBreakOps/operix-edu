@@ -1,93 +1,328 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, Users, UsersRound, CalendarCheck, 
-  TableProperties, FileSignature, FileSpreadsheet, 
-  ShieldAlert, Wallet, Settings, BookOpen, GraduationCap, Award
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard, Users, UserCheck, GraduationCap,
+  CalendarDays, TableProperties, Activity, BookOpen, Book,
+  FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,
+  Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
-import { useTenant } from '../../context/TenantContext';
 
-const theme = {
-  navy: '#0f172a', royal: '#2563eb', slate: '#f8fafc', textLight: '#94a3b8', white: '#ffffff'
+type IconType = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+
+export interface PageIndexEntry {
+  key: string;        // المسار النسبي داخل البوابة، مثال: 'finance/fees'
+  label: string;
+  icon: IconType;
+  group: string;
+  keywords: string[]; // مرادفات لدعم البحث الذكي
+}
+
+// سجلّ الصفحات الموحّد — يُبنى منه كل من قائمة الشريط الجانبي ومحرك بحث الشريط العلوي
+// (مطابق لمسارات App.tsx بما في ذلك صفحات المالية التي لم تكن ظاهرة سابقًا في القائمة)
+export const PAGE_INDEX: PageIndexEntry[] = [
+  { key: 'dashboard', label: 'لوحة القيادة', icon: LayoutDashboard, group: 'الرئيسية', keywords: ['dashboard', 'home', 'رئيسية'] },
+
+  { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student', 'طالب', 'طلاب'] },
+  { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent', 'ولي', 'أمر'] },
+  { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher', 'معلم', 'معلمين'] },
+
+  { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance', 'حضور', 'غياب'] },
+  { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable', 'schedule', 'جدول', 'حصص'] },
+  { key: 'behavior', label: 'السلوك والمواظبة', icon: Activity, group: 'الشؤون الأكاديمية', keywords: ['behavior', 'سلوك', 'مواظبة'] },
+  { key: 'subjects', label: 'المواد الدراسية', icon: Book, group: 'الشؤون الأكاديمية', keywords: ['subject', 'مواد', 'منهج'] },
+  { key: 'assignments', label: 'الواجبات', icon: BookOpen, group: 'الشؤون الأكاديمية', keywords: ['assignment', 'homework', 'واجب'] },
+  { key: 'results', label: 'النتائج', icon: FileSignature, group: 'الشؤون الأكاديمية', keywords: ['results', 'grades', 'نتائج', 'درجات'] },
+
+  { key: 'events', label: 'إدارة الفعاليات', icon: Calendar, group: 'الأنشطة والفعاليات', keywords: ['event', 'فعالية', 'نشاط'] },
+
+  { key: 'finance/fees', label: 'الرسوم الدراسية', icon: Wallet, group: 'الإدارة والمالية', keywords: ['fees', 'رسوم', 'دفع'] },
+  { key: 'finance/salaries', label: 'الرواتب', icon: Landmark, group: 'الإدارة والمالية', keywords: ['salary', 'راتب', 'رواتب'] },
+  { key: 'finance/debts', label: 'المديونيات', icon: Receipt, group: 'الإدارة والمالية', keywords: ['debt', 'ديون', 'مديونية'] },
+  { key: 'finance/logistics', label: 'اللوجستيات', icon: Package, group: 'الإدارة والمالية', keywords: ['logistics', 'لوجستيات', 'مخزون'] },
+  { key: 'finance/transportation', label: 'النقل المدرسي', icon: Bus, group: 'الإدارة والمالية', keywords: ['transportation', 'نقل', 'باص', 'حافلة'] },
+  { key: 'finance/kindergarten', label: 'مالية رياض الأطفال', icon: Landmark, group: 'الإدارة والمالية', keywords: ['kindergarten', 'رياض أطفال', 'حضانة'] },
+  { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services', 'خدمات خاصة', 'دعم'] },
+
+  { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox', 'studio', 'مستندات', 'تحرير'] },
+  { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings', 'إعدادات', 'ضبط'] },
+];
+
+// خريطة تسمية سريعة تُستخدم في مسار التنقل (Breadcrumbs) بالشريط العلوي
+export const NAV_LABELS: Record<string, string> = PAGE_INDEX.reduce((acc, p) => {
+  const lastSegment = p.key.split('/').pop() as string;
+  acc[lastSegment] = p.label;
+  return acc;
+}, { finance: 'الإدارة والمالية' } as Record<string, string>);
+
+export const PORTAL_LABELS: Record<string, string> = {
+  kindergarten: 'رياض الأطفال',
+  elementary: 'الابتدائية',
+  intermediate: 'المتوسطة',
+  secondary: 'الثانوية',
 };
 
-export default function Sidebar() {
-  const { workspace } = useTenant();
+const GROUP_ORDER = ['الرئيسية', 'المستخدمين', 'الشؤون الأكاديمية', 'الأنشطة والفعاليات', 'الإدارة والمالية', 'أدوات النظام'];
 
-  const menuGroups = [
-	{
-	  title: 'الرئيسية',
-	  items: [
-		{ to: '/app/dashboard', label: 'لوحة القيادة', icon: <LayoutDashboard size={20} /> }
-	  ]
-	},
-	{
-	  title: 'شؤون الطلاب',
-	  items: [
-		{ to: '/app/students', label: 'سجل الطلاب', icon: <Users size={20} /> },
-		{ to: '/app/parents', label: 'أولياء الأمور', icon: <UsersRound size={20} /> },
-		{ to: '/app/attendance', label: 'الحضور والغياب', icon: <CalendarCheck size={20} /> },
-		{ to: '/app/behavior', label: 'السلوك والمواظبة', icon: <ShieldAlert size={20} /> },
-	  ]
-	},
-	{
-	  title: 'الشؤون الأكاديمية',
-	  items: [
-		{ to: '/app/subjects', label: 'المواد الدراسية', icon: <BookOpen size={20} /> },
-		{ to: '/app/timetable', label: 'الجدول المدرسي', icon: <TableProperties size={20} /> },
-		{ to: '/app/assignments', label: 'الواجبات والاختبارات', icon: <FileSignature size={20} /> },
-		{ to: '/app/results', label: 'سجل الدرجات', icon: <FileSpreadsheet size={20} /> },
-		{ to: '/app/dox-studio', label: 'منصة Dox Studio', icon: <Award size={20} /> },
-	  ]
-	},
-	{
-	  title: 'الإدارة',
-	  items: [
-		{ to: '/app/teachers', label: 'الهيئة التعليمية', icon: <GraduationCap size={20} /> },
-		{ to: '/app/fees', label: 'الرسوم المالية', icon: <Wallet size={20} /> },
-		{ to: '/app/settings', label: 'الإعدادات', icon: <Settings size={20} /> },
-	  ]
+export default function Sidebar() {
+  const { portalType } = useParams<{ portalType: string }>();
+  const activePortal = portalType || 'elementary';
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [collapsed, setCollapsed] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<number>>(new Set([0]));
+
+  const toggleGroup = (index: number) => {
+	setOpenGroups((prev) => {
+	  const next = new Set(prev);
+	  if (next.has(index)) next.delete(index);
+	  else next.add(index);
+	  return next;
+	});
+  };
+
+  const handlePortalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+	const portal = e.target.value;
+	const currentSubPage = location.pathname.split('/').slice(3).join('/') || 'dashboard';
+	navigate(`/app/${portal}/${currentSubPage}`);
+  };
+
+  const navGroups = useMemo(() => (
+	GROUP_ORDER.map((title) => ({
+	  title,
+	  items: PAGE_INDEX
+		.filter((p) => p.group === title)
+		.map((p) => ({ name: p.label, path: `/app/${activePortal}/${p.key}`, icon: p.icon })),
+	}))
+  ), [activePortal]);
+
+  const isActive = (path: string) =>
+	location.pathname === path || location.pathname.startsWith(path + '/');
+
+  // يفتح تلقائيًا المجموعة التي تحتوي على المسار النشط عند تغيّر الصفحة
+  useEffect(() => {
+	const idx = navGroups.findIndex((g) => g.items.some((it) => isActive(it.path)));
+	if (idx !== -1) {
+	  setOpenGroups((prev) => (prev.has(idx) ? prev : new Set(prev).add(idx)));
 	}
-  ];
+  }, [location.pathname, navGroups]);
 
   return (
-	<aside className="no-print" style={{ width: '280px', backgroundColor: theme.navy, color: theme.white, display: 'flex', flexDirection: 'column', height: '100vh', borderLeft: '1px solid #1e293b' }}>
-	  <div style={{ padding: '24px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '12px' }}>
-		<div style={{ width: '40px', height: '40px', backgroundColor: theme.royal, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>E</div>
-		<div>
-		  <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>OPERIX Edu</h2>
-		  <p style={{ margin: 0, fontSize: '0.75rem', color: theme.textLight }}>{workspace?.name || 'مؤسسة تعليمية'}</p>
-		</div>
-	  </div>
+	<>
+	  <style>{`
+		.sidebar-nav-link {
+		  display: flex;
+		  align-items: center;
+		  gap: 14px;
+		  padding: 13px 16px;
+		  border-radius: 10px;
+		  text-decoration: none;
+		  color: #d9ecdf;
+		  font-weight: 700;
+		  font-size: 1.02rem;
+		  transition: background-color 0.15s ease, color 0.15s ease;
+		  border-right: 4px solid transparent;
+		  position: relative;
+		  white-space: nowrap;
+		}
+		.sidebar-nav-link:hover {
+		  background-color: rgba(201, 162, 39, 0.1);
+		  color: #ffffff;
+		}
+		.sidebar-nav-link.active {
+		  background-color: rgba(201, 162, 39, 0.16);
+		  color: var(--color-royal, #c9a227);
+		  font-weight: 900;
+		  border-right: 4px solid var(--color-royal, #c9a227);
+		}
+		.sidebar-nav-link svg { flex-shrink: 0; }
 
-	  <nav style={{ flex: 1, overflowY: 'auto', padding: '24px 16px' }} className="custom-scrollbar">
-		{menuGroups.map((group, idx) => (
-		  <div key={idx} style={{ marginBottom: '24px' }}>
-			<h3 style={{ fontSize: '0.75rem', color: theme.textLight, marginBottom: '12px', paddingRight: '12px', fontWeight: 800, textTransform: 'uppercase' }}>
-			  {group.title}
-			</h3>
-			<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-			  {group.items.map((item, i) => (
-				<NavLink
-				  key={i}
-				  to={item.to}
-				  style={({ isActive }) => ({
-					display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
-					borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem',
-					transition: 'all 0.2s',
-					backgroundColor: isActive ? theme.royal : 'transparent',
-					color: isActive ? theme.white : '#cbd5e1'
-				  })}
-				  onMouseEnter={(e) => { if (e.currentTarget.style.backgroundColor === 'transparent') e.currentTarget.style.backgroundColor = '#1e293b'; }}
-				  onMouseLeave={(e) => { if (e.currentTarget.style.backgroundColor === 'rgb(30, 41, 59)') e.currentTarget.style.backgroundColor = 'transparent'; }}
-				>
-				  {item.icon} {item.label}
-				</NavLink>
-			  ))}
+		.sidebar-group-toggle {
+		  display: flex; align-items: center; justify-content: space-between;
+		  width: 100%; background: none; border: none; cursor: pointer;
+		  padding: 6px 14px 10px 14px; color: #aecfbd;
+		  font-size: 0.82rem; font-weight: 900; text-transform: uppercase;
+		  letter-spacing: 0.04em;
+		}
+		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #7fa88f; }
+		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #c9a227; }
+
+		.sidebar-group-items {
+		  display: flex; flex-direction: column; gap: 4px;
+		  max-height: 0; overflow: hidden;
+		  transition: max-height 0.25s ease;
+		}
+		.sidebar-group-items.open { max-height: 700px; }
+
+		.sidebar-collapse-btn {
+		  position: absolute; top: 92px; left: -14px;
+		  width: 28px; height: 28px; border-radius: 50%;
+		  background: #c9a227; border: 3px solid #f7f5ee;
+		  display: flex; align-items: center; justify-content: center;
+		  cursor: pointer; color: #053b2b; z-index: 25;
+		  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+		  transition: transform 0.15s ease;
+		}
+		.sidebar-collapse-btn:hover { transform: scale(1.08); }
+
+		.nav-tooltip {
+		  position: absolute; right: calc(100% + 14px); top: 50%;
+		  transform: translateY(-50%);
+		  background: #053b2b; color: #fff; padding: 7px 14px;
+		  border-radius: 6px; font-size: 0.88rem; font-weight: 800;
+		  white-space: nowrap; opacity: 0; pointer-events: none;
+		  transition: opacity 0.15s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+		  border: 1px solid #c9a227;
+		}
+		.sidebar-nav-link:hover .nav-tooltip { opacity: 1; }
+	  `}</style>
+
+	  <aside className="no-print" style={{ ...styles.sidebar, width: collapsed ? '92px' : '304px' }}>
+
+		<button
+		  className="sidebar-collapse-btn"
+		  onClick={() => setCollapsed((c) => !c)}
+		  title={collapsed ? 'توسيع القائمة' : 'طي القائمة'}
+		>
+		  {collapsed ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+		</button>
+
+		<div style={styles.header}>
+		  <div style={styles.brandRow}>
+			<div style={styles.emblem}>
+			  <GraduationCap size={21} color="#053b2b" strokeWidth={2.5} />
 			</div>
+			{!collapsed && (
+			  <h2 style={styles.logo}>OPERIX <span style={styles.logoAccent}>Edu</span></h2>
+			)}
 		  </div>
-		))}
-	  </nav>
-	</aside>
+
+		  {!collapsed && (
+			<div style={{ position: 'relative' }}>
+			  <select value={activePortal} onChange={handlePortalChange} style={styles.portalSwitcher}>
+				<option value="kindergarten">رياض الأطفال</option>
+				<option value="elementary">الابتدائية</option>
+				<option value="intermediate">المتوسطة</option>
+				<option value="secondary">الثانوية</option>
+			  </select>
+			  <ChevronDown size={16} style={styles.chevron} />
+			</div>
+		  )}
+		</div>
+
+		<nav style={styles.nav}>
+		  {navGroups.map((group, index) => (
+			<div key={index} style={styles.navGroup}>
+			  {!collapsed && (
+				<button
+				  className={`sidebar-group-toggle ${openGroups.has(index) ? 'open' : ''}`}
+				  onClick={() => toggleGroup(index)}
+				>
+				  <span>{group.title}</span>
+				  <ChevronDown size={15} />
+				</button>
+			  )}
+			  <div className={`sidebar-group-items ${collapsed || openGroups.has(index) ? 'open' : ''}`}>
+				{group.items.map((link) => {
+				  const active = isActive(link.path);
+				  return (
+					<Link
+					  key={link.path}
+					  to={link.path}
+					  className={`sidebar-nav-link ${active ? 'active' : ''}`}
+					  style={collapsed ? { justifyContent: 'center', padding: '13px' } : undefined}
+					>
+					  <link.icon size={22} />
+					  {!collapsed && <span>{link.name}</span>}
+					  {collapsed && <span className="nav-tooltip">{link.name}</span>}
+					</Link>
+				  );
+				})}
+			  </div>
+			</div>
+		  ))}
+		</nav>
+
+		{!collapsed && (
+		  <div style={styles.footer}>
+			<span style={styles.footerText}>OPERIX Edu — الإصدار 2.4</span>
+		  </div>
+		)}
+	  </aside>
+	</>
   );
 }
+
+const styles: { [key: string]: React.CSSProperties } = {
+  sidebar: {
+	backgroundColor: '#053b2b',
+	borderLeft: '1px solid #032b1f',
+	display: 'flex',
+	flexDirection: 'column',
+	flexShrink: 0,
+	zIndex: 20,
+	height: '100%',
+	position: 'relative',
+	transition: 'width 0.22s ease',
+	overflow: 'visible',
+  },
+  header: {
+	padding: '26px 22px',
+	borderBottom: '3px solid #c9a227',
+	display: 'flex',
+	flexDirection: 'column',
+	gap: '18px',
+  },
+  brandRow: {
+	display: 'flex',
+	alignItems: 'center',
+	gap: '12px',
+  },
+  emblem: {
+	width: '38px',
+	height: '38px',
+	borderRadius: '9px',
+	backgroundColor: '#c9a227',
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	flexShrink: 0,
+  },
+  logo: {
+	color: '#ffffff',
+	fontSize: '1.55rem',
+	fontWeight: 900,
+	margin: 0,
+	letterSpacing: '-0.5px',
+	whiteSpace: 'nowrap',
+  },
+  logoAccent: {
+	color: '#c9a227',
+  },
+  portalSwitcher: {
+	width: '100%',
+	padding: '12px 34px 12px 14px',
+	borderRadius: '9px',
+	border: '1px solid #0e5a3f',
+	backgroundColor: '#0e5a3f',
+	color: '#ffffff',
+	fontWeight: 800,
+	fontSize: '0.95rem',
+	appearance: 'none',
+	cursor: 'pointer',
+	outline: 'none',
+  },
+  chevron: {
+	position: 'absolute', right: '13px', top: '50%', transform: 'translateY(-50%)',
+	pointerEvents: 'none', color: '#c9a227',
+  },
+  nav: {
+	padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '12px',
+	overflowY: 'auto', flex: 1,
+  },
+  navGroup: { display: 'flex', flexDirection: 'column' },
+  footer: {
+	padding: '16px 22px', borderTop: '1px solid #0e5a3f',
+  },
+  footerText: { fontSize: '0.75rem', color: '#8bab99', fontWeight: 700 },
+};

@@ -5,7 +5,7 @@ import {
   ChevronLeft, ChevronRight, Globe, Mail, HelpCircle, X, Sparkles, 
   CheckCircle, School, Search, ChevronDown, FileText
 } from 'lucide-react';
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 
 const OPS_API = 'https://script.google.com/macros/s/AKfycbxzwlFPfOFiUS5atnjkAuXDcr-L_-LSY33_S9d6t12P36qmTWthc00ywCKpReFxzLY/exec';
 const TARGET_EMAIL = 'operixsolution@gmail.com';

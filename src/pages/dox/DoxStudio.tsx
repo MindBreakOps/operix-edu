@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
+import { useTenant } from '../../context/TenantContext';
 import { useOutletContext } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { useTenant } from '../context/TenantContext';
+import { PageShell } from '../../components/layout/PageShell';
 import { 
   FileSignature, Printer, FileText, Hash, AlertTriangle, 
   FileWarning, Edit3, Upload, Loader2, Download, Award, 

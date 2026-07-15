@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useTenant } from '../context/TenantContext';
+import { supabase } from '../../lib/supabase';
+import { useTenant } from '../../context/TenantContext';
 import { Settings as SettingsIcon, Calendar, CheckCircle } from 'lucide-react';
 
 const theme = { navy: '#0f172a', royal: '#2563eb', slate: '#f8fafc', white: '#ffffff', border: '#e2e8f0', textDark: '#1e293b', textMuted: '#64748b' };

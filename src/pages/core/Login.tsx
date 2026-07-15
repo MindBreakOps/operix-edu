@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 import { Lock, Mail, ArrowRight, CheckCircle2, GraduationCap, Building2 } from 'lucide-react';
 // استيراد الشعار
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 
 const theme = { 
   navy: '#0f172a', 
@@ -29,9 +29,10 @@ export default function Login() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-	if (user) navigate('/app/dashboard');
-  }, [user, navigate]);
+ useEffect(() => {
+	 // Change from '/app/dashboard' to '/app'
+	 if (user) navigate('/app');
+   }, [user, navigate]);
 
   const handleDomainSubmit = (e: React.FormEvent) => {
 	e.preventDefault();
@@ -44,19 +45,20 @@ export default function Login() {
   };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
-	e.preventDefault();
-	setError('');
-	setIsSubmitting(true);
-
-	const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-
-	if (signInError) {
-	  setError('بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.');
-	  setIsSubmitting(false);
-	} else {
-	  window.location.href = '/app/dashboard';
-	}
-  };
+	  e.preventDefault();
+	  setError('');
+	  setIsSubmitting(true);
+  
+	  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  
+	  if (signInError) {
+		setError('بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.');
+		setIsSubmitting(false);
+	  } else {
+		// Change from '/app/dashboard' to '/app'
+		window.location.href = '/app';
+	  }
+	};
 
   return (
 	<div style={{ minHeight: '100vh', display: 'flex', backgroundColor: theme.slate, direction: 'rtl', fontFamily: '"Segoe UI", system-ui, sans-serif' }}>
