@@ -9,9 +9,9 @@ import {
 import logo from '../../assets/logo.png';
 
 const theme = {
-  navy: '#0f172a', royal: '#2563eb', slate: '#f8fafc',
-  white: '#ffffff', border: '#e2e8f0', textDark: '#1e293b', textMuted: '#64748b',
-  success: '#10b981', warning: '#f59e0b', danger: '#ef4444', purple: '#8b5cf6', cyan: '#0ea5e9'
+  navy: '#131b2e', royal: '#4f7df3', slate: '#f5f7fb',
+  white: '#ffffff', border: '#e4e8f0', textDark: '#1e293b', textMuted: '#64748b',
+  success: '#16a34a', warning: '#d97706', danger: '#ef4444', purple: '#8b5cf6', cyan: '#0ea5e9'
 };
 
 const STATUS = { PRESENT: 'حاضر', ABSENT: 'غائب', LATE: 'متأخر', PAID: 'مدفوع', UNPAID: 'غير مدفوع', OVERDUE: 'متأخر' };
@@ -130,22 +130,38 @@ export default function Dashboard() {
 	return Math.round((stats.attendanceToday / stats.students) * 100);
   }, [stats.students, stats.attendanceToday]);
 
-  const StatCard = ({ title, value, icon, color, subtitle }: { title: string, value: number | string, icon: React.ReactNode, color: string, subtitle?: string }) => (
-	<div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
-	  <div style={{ width: '60px', height: '60px', borderRadius: '16px', backgroundColor: `${color}15`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-		{icon}
+  const StatCard = ({ title, value, icon, color, subtitle, trend }: { title: string, value: number | string, icon: React.ReactNode, color: string, subtitle?: string, trend?: 'up' | 'down' | 'neutral' }) => (
+	<div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '20px', boxShadow: '0 1px 2px rgba(19,27,46,0.04)' }}>
+	  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+		<p style={{ margin: 0, color: theme.textMuted, fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{title}</p>
+		<div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: `${color}15`, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+		  {icon}
+		</div>
 	  </div>
-	  <div>
-		<p style={{ margin: '0 0 4px 0', color: theme.textMuted, fontSize: '0.9rem', fontWeight: 800 }}>{title}</p>
-		<h3 style={{ margin: 0, color: theme.navy, fontSize: '1.7rem', fontWeight: 900 }}>{isLoading ? '...' : value}</h3>
-		{subtitle && !isLoading && <p style={{ margin: '4px 0 0 0', color: theme.textMuted, fontSize: '0.78rem', fontWeight: 700 }}>{subtitle}</p>}
-	  </div>
+	  <h3 style={{ margin: '14px 0 0 0', color: theme.navy, fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.3px' }}>{isLoading ? '···' : value}</h3>
+	  {subtitle && !isLoading && (
+		<span style={{
+		  display: 'inline-block', marginTop: '10px', padding: '3px 9px', borderRadius: '999px',
+		  fontSize: '0.72rem', fontWeight: 800,
+		  backgroundColor: trend === 'down' ? '#fdeceb' : trend === 'up' ? '#e6f6ec' : theme.slate,
+		  color: trend === 'down' ? theme.danger : trend === 'up' ? theme.success : theme.textMuted,
+		}}>
+		  {subtitle}
+		</span>
+	  )}
 	</div>
   );
 
-  const Card = ({ title, children, style }: { title: string, children: React.ReactNode, style?: React.CSSProperties }) => (
-	<div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '16px', padding: '24px', ...style }}>
-	  <h3 style={{ margin: '0 0 20px 0', color: theme.navy, fontSize: '1.05rem', fontWeight: 900 }}>{title}</h3>
+  const Card = ({ title, tag, children, style }: { title: string, tag?: string, children: React.ReactNode, style?: React.CSSProperties }) => (
+	<div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '22px', boxShadow: '0 1px 2px rgba(19,27,46,0.04)', ...style }}>
+	  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+		<h3 style={{ margin: 0, color: theme.navy, fontSize: '0.98rem', fontWeight: 800 }}>{title}</h3>
+		{tag && (
+		  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: theme.success, backgroundColor: '#e6f6ec', padding: '3px 9px', borderRadius: '999px' }}>
+			{tag}
+		  </span>
+		)}
+	  </div>
 	  {children}
 	</div>
   );
@@ -156,7 +172,7 @@ export default function Dashboard() {
   return (
 	<div>
 	  <div style={{ marginBottom: '32px' }}>
-		<h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: theme.navy, margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>لوحة القيادة</h1>
+		<h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: theme.navy, margin: '0 0 8px 0', letterSpacing: '-0.4px' }}>لوحة القيادة</h1>
 		<p style={{ fontSize: '0.95rem', color: theme.textMuted, margin: 0 }}>مرحباً بك في النظام المدرسي. إليك نظرة عامة على إحصائيات اليوم.</p>
 	  </div>
 
@@ -170,16 +186,16 @@ export default function Dashboard() {
 	  )}
 
 	  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-		<StatCard title="إجمالي الطلاب" value={stats.students} icon={<Users size={26} />} color={theme.royal} />
-		<StatCard title="أولياء الأمور" value={stats.guardians} icon={<UsersRound size={26} />} color={theme.cyan} />
-		<StatCard title="الحضور اليوم" value={`${stats.attendanceToday} (${attendanceRate}%)`} icon={<CalendarCheck size={26} />} color={theme.success} subtitle={`من أصل ${stats.students} طالب`} />
-		<StatCard title="الواجبات النشطة" value={stats.activeAssignments} icon={<FileSignature size={26} />} color={theme.purple} />
-		<StatCard title="رسوم مستحقة" value={formatCurrency(stats.outstandingFees)} icon={<Wallet size={26} />} color={theme.warning} subtitle={stats.overdueFees > 0 ? `منها ${formatCurrency(stats.overdueFees)} متأخرة` : undefined} />
-		<StatCard title="فعاليات قادمة" value={stats.upcomingEventsCount} icon={<CalendarDays size={26} />} color={theme.navy} />
+		<StatCard title="إجمالي الطلاب" value={stats.students} icon={<Users size={20} />} color={theme.royal} />
+		<StatCard title="أولياء الأمور" value={stats.guardians} icon={<UsersRound size={20} />} color={theme.cyan} />
+		<StatCard title="الحضور اليوم" value={`${stats.attendanceToday} (${attendanceRate}%)`} icon={<CalendarCheck size={20} />} color={theme.success} subtitle={`من أصل ${stats.students} طالب`} trend={attendanceRate >= 90 ? 'up' : attendanceRate > 0 ? 'down' : 'neutral'} />
+		<StatCard title="الواجبات النشطة" value={stats.activeAssignments} icon={<FileSignature size={20} />} color={theme.purple} />
+		<StatCard title="رسوم مستحقة" value={formatCurrency(stats.outstandingFees)} icon={<Wallet size={20} />} color={theme.warning} subtitle={stats.overdueFees > 0 ? `منها ${formatCurrency(stats.overdueFees)} متأخرة` : undefined} trend={stats.overdueFees > 0 ? 'down' : 'neutral'} />
+		<StatCard title="فعاليات قادمة" value={stats.upcomingEventsCount} icon={<CalendarDays size={20} />} color={theme.navy} />
 	  </div>
 
 	  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginTop: '20px' }}>
-		<Card title="الحضور خلال آخر 7 أيام">
+		<Card title="الحضور خلال آخر 7 أيام" tag="مباشر">
 		  {isLoading ? (
 			<p style={{ color: theme.textMuted }}>...جاري التحميل</p>
 		  ) : (
@@ -275,7 +291,7 @@ export default function Dashboard() {
 		</Card>
 	  </div>
 
-	  <div style={{ marginTop: '20px', backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '16px', padding: '20px 32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+	  <div style={{ marginTop: '20px', backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '20px 32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
 		<img src={logo} alt="OPERIX Edu" style={{ height: '32px', objectFit: 'contain' }} />
 		<p style={{ color: theme.textMuted, margin: 0, fontSize: '0.85rem' }}>نظام OPERIX Edu — إدارة الشؤون الأكاديمية والمالية لمؤسستك.</p>
 	  </div>

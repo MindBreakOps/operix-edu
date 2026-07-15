@@ -1,26 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
 :root {
-  /* Core Theme Colors — inspired by Noor / Saudi MOE government portals:
-     deep emerald surfaces, a warm gold accent, ivory page background */
-  --color-navy: #053b2b;        /* deep forest green — sidebar/topbar surface */
-  --color-navy-2: #032b1f;      /* darker green — hairline borders on dark surfaces */
-  --color-navy-3: #0e5a3f;      /* mid green — hover/inputs on dark surfaces */
-  --color-royal: #c9a227;       /* gold accent — replaces royal blue for active/CTA states */
-  --color-royal-dark: #a9860f;  /* gold, pressed/hover */
-  --color-slate: #f7f5ee;       /* ivory page background */
+  /* Core Theme Colors — deep navy surfaces, a single blue accent,
+     cool ivory-gray page background (Meridian-style enterprise shell) */
+  --color-navy: #101a2e;        /* deep navy — sidebar surface */
+  --color-navy-2: #0a1220;      /* darker navy — hairline borders on dark surfaces */
+  --color-navy-3: #1a2740;      /* mid navy — hover/inputs on dark surfaces */
+  --color-royal: #4f7df3;       /* blue accent — active/CTA states */
+  --color-royal-dark: #3861c9;  /* blue, pressed/hover */
+  --color-slate: #f5f7fb;       /* cool ivory page background */
   --color-white: #ffffff;
-  --color-border: #e5decb;      /* warm border on light surfaces */
+  --color-border: #e4e8f0;      /* neutral border on light surfaces */
 
   /* Typography */
-  --color-text-dark: #1e293b;
+  --color-text-dark: #131b2e;
   --color-text-muted: #64748b;
-  --color-text-on-dark-muted: #9db8a8; /* muted text on green surfaces */
+  --color-text-on-dark-muted: #8b98b3; /* muted text on navy surfaces */
 
   /* Status Colors */
-  --color-success: #0e7a54;
+  --color-success: #16a34a;
   --color-danger: #ef4444;
-  --color-warning: #c9a227;
+  --color-warning: #d97706;
 }
 
 * {

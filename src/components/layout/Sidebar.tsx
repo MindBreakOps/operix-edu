@@ -113,42 +113,42 @@ export default function Sidebar() {
 		.sidebar-nav-link {
 		  display: flex;
 		  align-items: center;
-		  gap: 14px;
-		  padding: 13px 16px;
-		  border-radius: 10px;
+		  gap: 13px;
+		  padding: 10px 14px;
+		  border-radius: 9px;
 		  text-decoration: none;
-		  color: #d9ecdf;
-		  font-weight: 700;
-		  font-size: 1.02rem;
+		  color: #9aa7c2;
+		  font-weight: 600;
+		  font-size: 0.92rem;
 		  transition: background-color 0.15s ease, color 0.15s ease;
-		  border-right: 4px solid transparent;
+		  border-right: 3px solid transparent;
 		  position: relative;
 		  white-space: nowrap;
 		}
 		.sidebar-nav-link:hover {
-		  background-color: rgba(201, 162, 39, 0.1);
-		  color: #ffffff;
+		  background-color: rgba(79, 125, 243, 0.08);
+		  color: #e7ebf5;
 		}
 		.sidebar-nav-link.active {
-		  background-color: rgba(201, 162, 39, 0.16);
-		  color: var(--color-royal, #c9a227);
-		  font-weight: 900;
-		  border-right: 4px solid var(--color-royal, #c9a227);
+		  background-color: rgba(79, 125, 243, 0.14);
+		  color: var(--color-royal, #4f7df3);
+		  font-weight: 800;
+		  border-right: 3px solid var(--color-royal, #4f7df3);
 		}
 		.sidebar-nav-link svg { flex-shrink: 0; }
 
 		.sidebar-group-toggle {
 		  display: flex; align-items: center; justify-content: space-between;
 		  width: 100%; background: none; border: none; cursor: pointer;
-		  padding: 6px 14px 10px 14px; color: #aecfbd;
-		  font-size: 0.82rem; font-weight: 900; text-transform: uppercase;
-		  letter-spacing: 0.04em;
+		  padding: 6px 14px 8px 14px; color: #5c6a8a;
+		  font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+		  letter-spacing: 0.06em;
 		}
-		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #7fa88f; }
-		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #c9a227; }
+		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #445071; }
+		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #4f7df3; }
 
 		.sidebar-group-items {
-		  display: flex; flex-direction: column; gap: 4px;
+		  display: flex; flex-direction: column; gap: 2px;
 		  max-height: 0; overflow: hidden;
 		  transition: max-height 0.25s ease;
 		}
@@ -156,11 +156,11 @@ export default function Sidebar() {
 
 		.sidebar-collapse-btn {
 		  position: absolute; top: 92px; left: -14px;
-		  width: 28px; height: 28px; border-radius: 50%;
-		  background: #c9a227; border: 3px solid #f7f5ee;
+		  width: 26px; height: 26px; border-radius: 50%;
+		  background: #4f7df3; border: 3px solid #f5f7fb;
 		  display: flex; align-items: center; justify-content: center;
-		  cursor: pointer; color: #053b2b; z-index: 25;
-		  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+		  cursor: pointer; color: #ffffff; z-index: 25;
+		  box-shadow: 0 2px 8px rgba(16, 26, 46, 0.3);
 		  transition: transform 0.15s ease;
 		}
 		.sidebar-collapse-btn:hover { transform: scale(1.08); }
@@ -168,11 +168,11 @@ export default function Sidebar() {
 		.nav-tooltip {
 		  position: absolute; right: calc(100% + 14px); top: 50%;
 		  transform: translateY(-50%);
-		  background: #053b2b; color: #fff; padding: 7px 14px;
-		  border-radius: 6px; font-size: 0.88rem; font-weight: 800;
+		  background: #101a2e; color: #fff; padding: 7px 14px;
+		  border-radius: 6px; font-size: 0.84rem; font-weight: 700;
 		  white-space: nowrap; opacity: 0; pointer-events: none;
-		  transition: opacity 0.15s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-		  border: 1px solid #c9a227;
+		  transition: opacity 0.15s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		  border: 1px solid #263455;
 		}
 		.sidebar-nav-link:hover .nav-tooltip { opacity: 1; }
 	  `}</style>
@@ -190,7 +190,7 @@ export default function Sidebar() {
 		<div style={styles.header}>
 		  <div style={styles.brandRow}>
 			<div style={styles.emblem}>
-			  <GraduationCap size={21} color="#053b2b" strokeWidth={2.5} />
+			  <GraduationCap size={20} color="#ffffff" strokeWidth={2.5} />
 			</div>
 			{!collapsed && (
 			  <h2 style={styles.logo}>OPERIX <span style={styles.logoAccent}>Edu</span></h2>
@@ -255,8 +255,8 @@ export default function Sidebar() {
 
 const styles: { [key: string]: React.CSSProperties } = {
   sidebar: {
-	backgroundColor: '#053b2b',
-	borderLeft: '1px solid #032b1f',
+	backgroundColor: '#101a2e',
+	borderLeft: '1px solid #0a1220',
 	display: 'flex',
 	flexDirection: 'column',
 	flexShrink: 0,
@@ -267,11 +267,11 @@ const styles: { [key: string]: React.CSSProperties } = {
 	overflow: 'visible',
   },
   header: {
-	padding: '26px 22px',
-	borderBottom: '3px solid #c9a227',
+	padding: '22px 20px',
+	borderBottom: '1px solid #1e2a45',
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '18px',
+	gap: '16px',
   },
   brandRow: {
 	display: 'flex',
@@ -279,10 +279,10 @@ const styles: { [key: string]: React.CSSProperties } = {
 	gap: '12px',
   },
   emblem: {
-	width: '38px',
-	height: '38px',
+	width: '34px',
+	height: '34px',
 	borderRadius: '9px',
-	backgroundColor: '#c9a227',
+	backgroundColor: '#4f7df3',
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center',
@@ -290,39 +290,39 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   logo: {
 	color: '#ffffff',
-	fontSize: '1.55rem',
-	fontWeight: 900,
+	fontSize: '1.3rem',
+	fontWeight: 800,
 	margin: 0,
-	letterSpacing: '-0.5px',
+	letterSpacing: '-0.3px',
 	whiteSpace: 'nowrap',
   },
   logoAccent: {
-	color: '#c9a227',
+	color: '#4f7df3',
   },
   portalSwitcher: {
 	width: '100%',
-	padding: '12px 34px 12px 14px',
+	padding: '11px 34px 11px 14px',
 	borderRadius: '9px',
-	border: '1px solid #0e5a3f',
-	backgroundColor: '#0e5a3f',
-	color: '#ffffff',
-	fontWeight: 800,
-	fontSize: '0.95rem',
+	border: '1px solid #263455',
+	backgroundColor: '#182238',
+	color: '#e7ebf5',
+	fontWeight: 700,
+	fontSize: '0.88rem',
 	appearance: 'none',
 	cursor: 'pointer',
 	outline: 'none',
   },
   chevron: {
 	position: 'absolute', right: '13px', top: '50%', transform: 'translateY(-50%)',
-	pointerEvents: 'none', color: '#c9a227',
+	pointerEvents: 'none', color: '#5c6a8a',
   },
   nav: {
-	padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '12px',
+	padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: '10px',
 	overflowY: 'auto', flex: 1,
   },
   navGroup: { display: 'flex', flexDirection: 'column' },
   footer: {
-	padding: '16px 22px', borderTop: '1px solid #0e5a3f',
+	padding: '16px 22px', borderTop: '1px solid #1e2a45',
   },
-  footerText: { fontSize: '0.75rem', color: '#8bab99', fontWeight: 700 },
+  footerText: { fontSize: '0.72rem', color: '#5c6a8a', fontWeight: 600 },
 };
