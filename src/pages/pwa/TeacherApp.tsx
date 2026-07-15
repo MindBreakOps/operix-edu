@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import {
   WifiOff, CloudUpload, CheckSquare, Users, BookOpen, Clock,
   Lock, Mail, ArrowRight, ShieldCheck, KeyRound, Globe, LogOut,
   Plus, Search, Calendar as CalendarIcon, CheckCircle2, XCircle,
   ClipboardList, GraduationCap, Sparkles, Phone, X, AlertCircle, Save,
   ExternalLink, LifeBuoy, Building2, FileText, Paperclip, Image as ImageIcon,
-  CalendarDays, ChevronDown, Filter
+  CalendarDays, ChevronDown, Filter, ChevronLeft, MoreHorizontal
 } from 'lucide-react';
 import { useOfflineSync } from '../../hooks/useOfflineSync';
 import { useAuth } from '../../context/AuthContext';
@@ -1362,10 +1362,28 @@ const PWAStudents = ({ activePortal }: { activePortal: string }) => {
 // ==============================================================
 // 10. MAIN TEACHER APP SHELL (WITH PORTAL SWITCHER)
 // ==============================================================
+// Bottom-nav tab data, iOS-style: if the list grows past 5 tabs, only the
+// first MAX_VISIBLE_TABS show directly; the rest collapse behind "المزيد".
+const TEACHER_NAV_TABS = [
+  { path: 'timetable', label: 'الجدول', icon: Clock },
+  { path: 'attendance', label: 'التحضير', icon: CheckSquare },
+  { path: 'assignments', label: 'الواجبات', icon: BookOpen },
+  { path: 'students', label: 'الطلاب', icon: Users },
+  { path: 'behavior', label: 'السلوك', icon: ClipboardList },
+  { path: 'results', label: 'النتائج', icon: GraduationCap },
+  { path: 'events', label: 'الأنشطة', icon: Sparkles },
+];
+const MAX_VISIBLE_TABS = 4;
+const PRIMARY_NAV_TABS = TEACHER_NAV_TABS.length > 5 ? TEACHER_NAV_TABS.slice(0, MAX_VISIBLE_TABS) : TEACHER_NAV_TABS;
+const OVERFLOW_NAV_TABS = TEACHER_NAV_TABS.length > 5 ? TEACHER_NAV_TABS.slice(MAX_VISIBLE_TABS) : [];
+
 export default function TeacherApp() {
   const { user, isLoading } = useAuth();
   const { isOnline, pendingSyncs } = useOfflineSync();
   const [activePortal, setActivePortal] = useState('elementary');
+  const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const isMoreActive = moreOpen || OVERFLOW_NAV_TABS.some((tab) => location.pathname.startsWith(`/teacher-app/${tab.path}`));
 
   const handleLogout = async () => {
 	await supabase.auth.signOut();
@@ -1423,34 +1441,62 @@ export default function TeacherApp() {
 		</Routes>
 	  </main>
 
-	  {/* Mobile Bottom Navigation — primary 4 tabs; secondary modules reachable via "المزيد" */}
+	  {/* Bottom navigation — iOS-style: shows first 4 tabs; rest collapse behind "المزيد" once total tabs exceed 5 */}
 	  <nav style={styles.bottomNav}>
 		<div style={styles.navContainer}>
-		  <NavLink to="/teacher-app/timetable" style={({ isActive }) => (isActive ? styles.navItemActive : styles.navItem)}>
-			{({ isActive }) => (<><Clock size={22} color={isActive ? '#059669' : '#9ca3af'} fill={isActive ? '#d1fae5' : 'transparent'} /><span>الجدول</span></>)}
-		  </NavLink>
-		  <NavLink to="/teacher-app/attendance" style={({ isActive }) => (isActive ? styles.navItemActive : styles.navItem)}>
-			{({ isActive }) => (<><CheckSquare size={22} color={isActive ? '#059669' : '#9ca3af'} fill={isActive ? '#d1fae5' : 'transparent'} /><span>التحضير</span></>)}
-		  </NavLink>
-		  <NavLink to="/teacher-app/assignments" style={({ isActive }) => (isActive ? styles.navItemActive : styles.navItem)}>
-			{({ isActive }) => (<><BookOpen size={22} color={isActive ? '#059669' : '#9ca3af'} fill={isActive ? '#d1fae5' : 'transparent'} /><span>الواجبات</span></>)}
-		  </NavLink>
-		  <NavLink to="/teacher-app/students" style={({ isActive }) => (isActive ? styles.navItemActive : styles.navItem)}>
-			{({ isActive }) => (<><Users size={22} color={isActive ? '#059669' : '#9ca3af'} fill={isActive ? '#d1fae5' : 'transparent'} /><span>الطلاب</span></>)}
-		  </NavLink>
-		</div>
-		<div style={styles.navContainerSecondary}>
-		  <NavLink to="/teacher-app/behavior" style={({ isActive }) => (isActive ? styles.navItemActiveSm : styles.navItemSm)}>
-			<ClipboardList size={16} /><span>السلوك</span>
-		  </NavLink>
-		  <NavLink to="/teacher-app/results" style={({ isActive }) => (isActive ? styles.navItemActiveSm : styles.navItemSm)}>
-			<GraduationCap size={16} /><span>النتائج</span>
-		  </NavLink>
-		  <NavLink to="/teacher-app/events" style={({ isActive }) => (isActive ? styles.navItemActiveSm : styles.navItemSm)}>
-			<Sparkles size={16} /><span>الأنشطة</span>
-		  </NavLink>
+		  {PRIMARY_NAV_TABS.map((tab) => {
+			const Icon = tab.icon;
+			return (
+			  <NavLink key={tab.path} to={`/teacher-app/${tab.path}`} style={({ isActive }) => (isActive ? styles.navItemActive : styles.navItem)}>
+				{({ isActive }) => (
+				  <>
+					<Icon size={22} color={isActive ? '#059669' : '#9ca3af'} fill={isActive ? '#d1fae5' : 'transparent'} />
+					<span>{tab.label}</span>
+				  </>
+				)}
+			  </NavLink>
+			);
+		  })}
+
+		  {OVERFLOW_NAV_TABS.length > 0 && (
+			<button
+			  type="button"
+			  onClick={() => setMoreOpen(true)}
+			  style={{ ...(isMoreActive ? styles.navItemActive : styles.navItem), ...styles.navButtonReset }}
+			>
+			  <MoreHorizontal size={22} color={isMoreActive ? '#059669' : '#9ca3af'} />
+			  <span>المزيد</span>
+			</button>
+		  )}
 		</div>
 	  </nav>
+
+	  {moreOpen && (
+		<Modal title="المزيد" onClose={() => setMoreOpen(false)}>
+		  {OVERFLOW_NAV_TABS.map((tab, idx) => {
+			const Icon = tab.icon;
+			const isLast = idx === OVERFLOW_NAV_TABS.length - 1;
+			return (
+			  <NavLink
+				key={tab.path}
+				to={`/teacher-app/${tab.path}`}
+				onClick={() => setMoreOpen(false)}
+				style={{ ...styles.moreListItem, borderBottom: isLast ? 'none' : styles.moreListItem.borderBottom }}
+			  >
+				{({ isActive }) => (
+				  <>
+					<span style={{ ...styles.moreListIconBox, backgroundColor: isActive ? '#d1fae5' : '#f3f4f6' }}>
+					  <Icon size={20} color={isActive ? '#059669' : '#374151'} />
+					</span>
+					<span style={{ ...styles.moreListLabel, color: isActive ? '#059669' : '#111827' }}>{tab.label}</span>
+					{isActive ? <CheckCircle2 size={18} color="#059669" /> : <ChevronLeft size={18} color="#d1d5db" />}
+				  </>
+				)}
+			  </NavLink>
+			);
+		  })}
+		</Modal>
+	  )}
 	</div>
   );
 }
@@ -1507,7 +1553,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   syncBadge: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 800, color: '#d97706', backgroundColor: '#fffbeb', padding: '4px 8px', borderRadius: '20px', border: '1px solid #fde68a' },
   logoutBtn: { background: '#f3f4f6', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 
-  mainContent: { flex: 1, overflowY: 'auto', paddingBottom: '110px', backgroundColor: '#f9fafb' },
+  mainContent: { flex: 1, overflowY: 'auto', paddingBottom: '100px', backgroundColor: '#f9fafb' },
   pageContent: { padding: '24px 20px' },
   pageTitle: { margin: '0 0 20px 0', fontSize: '1.3rem', fontWeight: 900, color: '#111827' },
   placeholder: { padding: '40px', textAlign: 'center', fontWeight: 800, color: '#9ca3af' },
@@ -1554,11 +1600,12 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   bottomNav: { position: 'absolute', bottom: 0, left: 0, width: '100%', backgroundColor: '#ffffff', borderTop: '1px solid #e5e7eb', paddingBottom: 'env(safe-area-inset-bottom)', zIndex: 50 },
   navContainer: { display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '65px' },
-  navContainerSecondary: { display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '38px', borderTop: '1px solid #f3f4f6' },
   navItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '4px', textDecoration: 'none', color: '#9ca3af', fontSize: '0.7rem', fontWeight: 800 },
   navItemActive: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '4px', textDecoration: 'none', color: '#059669', fontSize: '0.7rem', fontWeight: 800 },
-  navItemSm: { display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#9ca3af', fontSize: '0.65rem', fontWeight: 700 },
-  navItemActiveSm: { display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#059669', fontSize: '0.65rem', fontWeight: 800 },
+  navButtonReset: { background: 'none', border: 'none', padding: 0, margin: 0, font: 'inherit', WebkitTapHighlightColor: 'transparent' },
+  moreListItem: { display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 2px', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid #f3f4f6' },
+  moreListIconBox: { width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  moreListLabel: { flex: 1, fontSize: '0.92rem', fontWeight: 800 },
 
   loadingContainer: { display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9fafb' },
   spinner: { width: '40px', height: '40px', border: '4px solid #d1fae5', borderTop: '4px solid #059669', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '16px' }
