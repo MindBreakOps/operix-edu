@@ -17,7 +17,7 @@ export default function SpecialServices() {
   const [formData, setFormData] = useState({ 
 	student_id: '', 
 	amount: 0, 
-	currency: 'SAR', 
+	currency: 'SDG', 
 	service_type: 'دروس تقوية إضافية', 
 	status: 'غير مدفوع', 
 	due_date: new Date().toISOString().split('T')[0] 
@@ -199,7 +199,7 @@ export default function SpecialServices() {
 				  <label style={styles.label}>العملة</label>
 				  <select required style={styles.input} value={formData.currency} onChange={e => setFormData({...formData, currency: e.target.value})}>
 					<option value="SAR">SAR</option>
-					<option value="USD">USD</option>
+					<option value="SDG">SDG</option>
 				  </select>
 				</div>
 			  </div>

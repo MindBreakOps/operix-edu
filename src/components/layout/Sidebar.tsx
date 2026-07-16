@@ -7,6 +7,7 @@ import {
   Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight, FileText
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; 
+import logo from '../../assets/logo.png';
 
 type IconType = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
 
@@ -123,70 +124,77 @@ export default function Sidebar() {
 		.sidebar-nav-link {
 		  display: flex;
 		  align-items: center;
-		  gap: 13px;
-		  padding: 10px 14px;
-		  border-radius: 9px;
+		  gap: 12px;
+		  padding: 9px 12px;
+		  border-radius: 10px;
 		  text-decoration: none;
-		  color: #cbd5e1;
+		  color: #90a0c0;
 		  font-weight: 600;
-		  font-size: 1.02rem;
-		  transition: background-color 0.2s ease, color 0.2s ease;
-		  border-right: 3px solid transparent;
+		  font-size: 0.92rem;
+		  transition: background-color 0.18s ease, color 0.18s ease;
 		  position: relative;
 		  white-space: nowrap;
 		}
 		.sidebar-nav-link:hover {
-		  background-color: rgba(255, 255, 255, 0.05);
-		  color: #ffffff;
+		  background-color: rgba(255, 255, 255, 0.045);
+		  color: #f1f5f9;
 		}
 		.sidebar-nav-link.active {
-		  background-color: rgba(79, 125, 243, 0.14);
+		  background: linear-gradient(90deg, rgba(79,125,243,0.16), rgba(79,125,243,0.05));
 		  color: #ffffff;
-		  font-weight: 800;
-		  border-right: 3px solid var(--icon-color, #4f7df3);
+		  font-weight: 700;
 		}
-		
+		.sidebar-nav-link.active::before {
+		  content: '';
+		  position: absolute;
+		  right: 0; top: 8px; bottom: 8px;
+		  width: 3px;
+		  border-radius: 3px;
+		  background: var(--icon-color, #4f7df3);
+		}
+
 		.sidebar-nav-link svg { 
 		  flex-shrink: 0; 
-		  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
-		  color: #94a3b8; 
+		  transition: transform 0.25s ease, color 0.18s ease;
+		  color: #7686a8; 
 		}
 		.sidebar-nav-link:hover svg {
 		  color: var(--icon-color);
-		  transform: scale(1.18) rotate(4deg);
+		  transform: translateX(-1px);
 		}
 		.sidebar-nav-link.active svg {
 		  color: var(--icon-color);
-		  transform: scale(1.1);
 		}
 
 		.sidebar-group-toggle {
 		  display: flex; align-items: center; justify-content: space-between;
 		  width: 100%; background: none; border: none; cursor: pointer;
-		  padding: 6px 14px 8px 14px; color: #ffffff; /* Bright White */
-		  font-size: 0.95rem; font-weight: 800; text-transform: uppercase; /* Increased font size */
-		  letter-spacing: 0.06em;
+		  padding: 4px 12px 7px 12px; color: #56648a;
+		  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+		  letter-spacing: 0.08em;
 		}
-		.sidebar-group-toggle svg { transition: transform 0.2s ease; color: #ffffff; }
-		.sidebar-group-toggle.open svg { transform: rotate(180deg); color: #ffffff; }
+		.sidebar-group-toggle:hover { color: #8fa2c9; }
+		.sidebar-group-toggle svg { transition: transform 0.2s ease, color 0.18s ease; color: #56648a; width: 13px; height: 13px; }
+		.sidebar-group-toggle:hover svg { color: #8fa2c9; }
+		.sidebar-group-toggle.open svg { transform: rotate(180deg); }
 
 		.sidebar-group-items {
-		  display: flex; flex-direction: column; gap: 4px;
+		  display: flex; flex-direction: column; gap: 2px;
 		  max-height: 0; overflow: hidden;
 		  transition: max-height 0.3s ease-in-out;
 		}
 		.sidebar-group-items.open { max-height: 700px; }
 
 		.sidebar-collapse-btn {
-		  position: absolute; top: 92px; left: -14px;
-		  width: 26px; height: 26px; border-radius: 50%;
-		  background: #4f7df3; border: 3px solid #f5f7fb;
+		  position: absolute; top: 34px; left: -13px;
+		  width: 24px; height: 24px; border-radius: 50%;
+		  background: #1a2540; border: 1px solid #2c3a5c;
 		  display: flex; align-items: center; justify-content: center;
-		  cursor: pointer; color: #ffffff; z-index: 25;
-		  box-shadow: 0 2px 8px rgba(16, 26, 46, 0.3);
-		  transition: transform 0.15s ease;
+		  cursor: pointer; color: #cbd5e1; z-index: 25;
+		  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+		  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 		}
-		.sidebar-collapse-btn:hover { transform: scale(1.08); }
+		.sidebar-collapse-btn:hover { transform: scale(1.08); background: #4f7df3; border-color: #4f7df3; color: #ffffff; }
 
 		.nav-tooltip {
 		  position: absolute; right: calc(100% + 14px); top: 50%;
@@ -212,11 +220,14 @@ export default function Sidebar() {
 
 		<div style={styles.header}>
 		  <div style={styles.brandRow}>
-			<div style={styles.emblem}>
-			  <GraduationCap size={20} color="#ffffff" strokeWidth={2.5} />
+			<div style={styles.logoChip}>
+			  <img src={logo} alt="OPERIX" style={styles.logoImg} />
 			</div>
 			{!collapsed && (
-			  <h2 style={styles.logo}>OPERIX <span style={styles.logoAccent}>Edu</span></h2>
+			  <div style={styles.brandTextCol}>
+				<h2 style={styles.logoText}>OPERIX <span style={styles.logoAccent}>Edu</span></h2>
+				<span style={styles.brandSub}>لوحة التحكم</span>
+			  </div>
 			)}
 		  </div>
 
@@ -281,7 +292,7 @@ export default function Sidebar() {
 
 const styles: { [key: string]: React.CSSProperties } = {
   sidebar: {
-	backgroundColor: '#101a2e',
+	backgroundColor: '#0d1526',
 	borderLeft: '1px solid #0a1220',
 	display: 'flex',
 	flexDirection: 'column',
@@ -291,32 +302,46 @@ const styles: { [key: string]: React.CSSProperties } = {
 	position: 'relative',
 	transition: 'width 0.22s ease',
 	overflow: 'visible',
+	boxShadow: '4px 0 24px rgba(0,0,0,0.12)',
   },
   header: {
-	padding: '22px 20px',
-	borderBottom: '1px solid #1e2a45',
+	padding: '20px 18px 18px 18px',
+	borderBottom: '1px solid #1b2540',
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '16px',
+	gap: '18px',
   },
   brandRow: {
 	display: 'flex',
 	alignItems: 'center',
-	gap: '12px',
+	gap: '11px',
   },
-  emblem: {
-	width: '34px',
-	height: '34px',
-	borderRadius: '9px',
-	backgroundColor: '#4f7df3',
+  logoChip: {
+	width: '40px',
+	height: '40px',
+	borderRadius: '11px',
+	backgroundColor: '#ffffff',
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center',
 	flexShrink: 0,
+	padding: '5px',
+	boxShadow: '0 2px 8px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.04)',
   },
-  logo: {
+  logoImg: {
+	width: '100%',
+	height: '100%',
+	objectFit: 'contain',
+  },
+  brandTextCol: {
+	display: 'flex',
+	flexDirection: 'column',
+	gap: '1px',
+	minWidth: 0,
+  },
+  logoText: {
 	color: '#ffffff',
-	fontSize: '1.3rem',
+	fontSize: '1.16rem',
 	fontWeight: 800,
 	margin: 0,
 	letterSpacing: '-0.3px',
@@ -325,30 +350,36 @@ const styles: { [key: string]: React.CSSProperties } = {
   logoAccent: {
 	color: '#4f7df3',
   },
+  brandSub: {
+	fontSize: '0.72rem',
+	color: '#5c6a8a',
+	fontWeight: 600,
+  },
   portalSwitcher: {
 	width: '100%',
-	padding: '11px 34px 11px 14px',
-	borderRadius: '9px',
-	border: '1px solid #263455',
-	backgroundColor: '#182238',
+	padding: '10px 34px 10px 14px',
+	borderRadius: '10px',
+	border: '1px solid #22304e',
+	backgroundColor: '#141d34',
 	color: '#e7ebf5',
 	fontWeight: 700,
-	fontSize: '0.95rem', 
+	fontSize: '0.88rem', 
 	appearance: 'none',
 	cursor: 'pointer',
 	outline: 'none',
+	transition: 'border-color 0.15s ease',
   },
   chevron: {
 	position: 'absolute', right: '13px', top: '50%', transform: 'translateY(-50%)',
 	pointerEvents: 'none', color: '#5c6a8a',
   },
   nav: {
-	padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: '10px',
+	padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '14px',
 	overflowY: 'auto', flex: 1,
   },
   navGroup: { display: 'flex', flexDirection: 'column' },
   footer: {
-	padding: '16px 22px', borderTop: '1px solid #1e2a45',
+	padding: '14px 20px', borderTop: '1px solid #1b2540',
   },
-  footerText: { fontSize: '0.75rem', color: '#64748b', fontWeight: 600 },
+  footerText: { fontSize: '0.72rem', color: '#5c6a8a', fontWeight: 600 },
 };

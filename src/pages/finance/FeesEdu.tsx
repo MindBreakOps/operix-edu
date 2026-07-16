@@ -179,7 +179,7 @@ export default function FeesEdu() {
 				  <select required style={styles.input} value={formData.currency} onChange={e => setFormData({...formData, currency: e.target.value})}>
 					<option value="SAR">SAR (ريال سعودي)</option>
 					<option value="SDG">SDG (جنيه سوداني)</option>
-					<option value="USD">USD (دولار أمريكي)</option>
+					<option value="SDG">SDG (دولار أمريكي)</option>
 				  </select>
 				</div>
 			  </div>
