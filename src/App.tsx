@@ -35,13 +35,15 @@ import SubscriptionsEdu from './pages/core/SubscriptionsEdu';
 import Login from './pages/core/Login';
 import Dashboard from './pages/core/Dashboard';
 import Settings from './pages/core/Settings';
+import RegulationsEdu from './pages/core/RegulationsEdu';
 import TeacherApp from './pages/pwa/TeacherApp'; // استيراد تطبيق المعلم
 
 // --- Users Module ---
 import StudentsEdu from './pages/users/StudentsEdu';
 import ParentsEdu from './pages/users/ParentsEdu';
-import TeachersEdu from './pages/users/TeachersEdu';
-
+import TeachersEdu from './pages/users/TeacherEdu';
+import StaffEdu from 
+'./pages/users/StaffEdu';
 // --- Academic Module ---
 import AttendanceEdu from './pages/academic/AttendanceEdu';
 import TimetableEdu from './pages/academic/TimetableEdu';
@@ -117,10 +119,12 @@ export default function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="settings" element={<Settings />} />
+                <Route path="regulations" element={<RegulationsEdu />} />
 
               <Route path="students" element={<StudentsEdu />} />
               <Route path="parents" element={<ParentsEdu />} />
               <Route path="teachers" element={<TeachersEdu />} />
+              <Route path="staff" element={<StaffEdu />} />
 
               <Route path="attendance" element={<AttendanceEdu />} />
               <Route path="timetable" element={<TimetableEdu />} />

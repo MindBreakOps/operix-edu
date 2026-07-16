@@ -1,0 +1,28 @@
+/**
+ * TeachersEdu — Academic staff & tasks portal (upgraded)
+ * ============================================================================
+ * Things to verify against your live database before shipping this:
+ *
+ * 1. New column needed for file sharing to persist:
+ *      alter table public.teachers_edu_tasks
+ *        add column if not exists attachments jsonb not null default '[]'::jsonb;
+ *
+ * 2. teacher_id on teacher_assignments_edu / timetable_edu / teachers_edu_tasks
+ *    all reference employees_edu.id per your latest migration — this file uses
+ *    selectedTeacher.id (the employee row's id) everywhere, never profile_id.
+ *    profile_id is only used now to show the "has a system account" badge.
+ *
+ * 3. DAYS / PERIODS_COUNT below assume a Sunday–Thursday week with 7 periods
+ *    a day. Adjust the constants if your rows use a different convention.
+ *
+ * 4. Assumes teacher_assignments_edu / timetable_edu link to subjects via a
+ *    `subject_id` column (matching the existing subjects_edu(name) join).
+ *    If your FK column is named differently, update the two spots marked
+ *    SUBJECT_FK below.
+ *
+ * 5. Real file uploads go through uploadFileToDrive() below — wire that to
+ *    your GAS upload endpoint (the same middleware behind employees_edu's
+ *    pdf_url / cert_url). Until then, use "add link" to attach a URL you
+ *    already have (e.g. a Google Drive link) — that path works today.
+ * ============================================================================
+ */

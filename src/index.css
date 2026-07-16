@@ -1,28 +1,31 @@
-@import url('https://googleapis.com');
-body { font-family: 'Almarai', sans-serif; }
-
+/* استيراد خط Almarai بشكل صحيح ومباشر من جوجل */
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
 
 :root {
-  /* Core Theme Colors — deep navy surfaces, a single blue accent,
-     cool ivory-gray page background (Meridian-style enterprise shell) */
-  --color-navy: #101a2e;        /* deep navy — sidebar surface */
-  --color-navy-2: #0a1220;      /* darker navy — hairline borders on dark surfaces */
-  --color-navy-3: #1a2740;      /* mid navy — hover/inputs on dark surfaces */
-  --color-royal: #4f7df3;       /* blue accent — active/CTA states */
-  --color-royal-dark: #3861c9;  /* blue, pressed/hover */
-  --color-slate: #f5f7fb;       /* cool ivory page background */
+  /* الألوان الأساسية الداكنة - احترافية وهادئة للعين */
+  --color-navy: #0f172a;        /* كحلي عميق وغني */
+  --color-navy-2: #1e293b;      /* كحلي أفتح قليلاً للحدود */
+  --color-navy-3: #334155;      
+  
+  /* الألوان المفعمة بالحياة (Lively Accents) */
+  --color-royal: #3b82f6;       /* أزرق ساطع وحيوي (للتفاعلات الأساسية) */
+  --color-royal-dark: #2563eb;  
+  --color-accent: #f59e0b;      /* عنبري/ذهبي دافئ (لجذب الانتباه وإعطاء روح للنظام) */
+  
+  /* الخلفيات */
+  --color-slate: #f8fafc;       /* رمادي فاتح جداً ومشرق لخلفية النظام */
   --color-white: #ffffff;
-  --color-border: #e4e8f0;      /* neutral border on light surfaces */
+  --color-border: #e2e8f0;      /* لون حدود ناعم ونظيف */
 
-  /* Typography */
-  --color-text-dark: #131b2e;
+  /* النصوص */
+  --color-text-dark: #0f172a;
   --color-text-muted: #64748b;
-  --color-text-on-dark-muted: #8b98b3; /* muted text on navy surfaces */
 
-  /* Status Colors */
-  --color-success: #16a34a;
-  --color-danger: #ef4444;
-  --color-warning: #d97706;
+  /* ألوان الحالات (مشرقة وعصرية) */
+  --color-success: #10b981;     /* أخضر زمردي نضر */
+  --color-danger: #f43f5e;      /* أحمر وردي ساطع (أكثر حيوية من الأحمر التقليدي) */
+  --color-warning: #f59e0b;     /* برتقالي/ذهبي تحذيري */
+  --color-info: #0ea5e9;        /* أزرق سماوي مشرق */
 }
 
 * {
@@ -32,17 +35,19 @@ body { font-family: 'Almarai', sans-serif; }
 }
 
 body {
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Almarai', sans-serif;
   background-color: var(--color-slate);
   color: var(--color-text-dark);
   direction: rtl;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================
-   POLISH LAYER — scrollbars, focus states
+   اللمسات الجمالية — أشرطة التمرير والتركيز
    ========================================== */
 
-/* Themed scrollbar to match the green/gold identity instead of default OS chrome */
+/* شريط تمرير حيوي وعصري */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -51,26 +56,28 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(201, 162, 39, 0.45);
+  background-color: rgba(59, 130, 246, 0.4); /* أزرق شبه شفاف */
   border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(201, 162, 39, 0.7);
+  background-color: var(--color-royal); /* يضيء عند تمرير الماوس */
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 162, 39, 0.45) transparent;
+  scrollbar-color: rgba(59, 130, 246, 0.4) transparent;
 }
 
-/* Visible keyboard focus everywhere — accessibility quality floor */
+/* تأثير التحديد (Focus) الحيوي للوحة المفاتيح */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
+textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-royal, #c9a227);
+  outline: 2px solid var(--color-accent); /* استخدام اللون الذهبي الدافئ للتحديد */
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 @media (max-width: 900px) {
@@ -79,41 +86,22 @@ select:focus-visible,
 }
 
 /* ==========================================
-   GLOBAL PRINT ENGINE (Hidden Visual Contents)
+   محرك الطباعة العالمي
    ========================================== */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  /* The designated printable area becomes the only visible element */
-  #printable-area, #printable-area * {
-    visibility: visible;
-  }
-  
-  #printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    border: none;
-  }
-
-  /* Global utility to hide UI controls during print */
   .no-print {
     display: none !important;
   }
 
-  /* Global utility to show elements ONLY during print */
   .print-only {
     display: block !important;
   }
+
+  body {
+    background-color: transparent;
+  }
 }
 
-/* Default state for print-only elements */
 .print-only {
   display: none;
 }

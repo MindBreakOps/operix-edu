@@ -7,12 +7,12 @@ import { PageShell } from '../../components/layout/PageShell';
 export default function Salaries() {
   const { workspace } = useTenant();
   const [salaries, setSalaries] = useState<any[]>([]);
-  const [teachers, setTeachers] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]); // تغيير من teachers إلى employees
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [formData, setFormData] = useState({
-	teacher_id: '',
+	employee_id: '', // تغيير من teacher_id إلى employee_id
 	base_salary: 0,
 	incentives: 0,
 	deductions: 0,
@@ -24,19 +24,22 @@ export default function Salaries() {
 	if (!workspace) return;
 	setIsLoading(true);
 
+	// 1. جلب مسيرات الرواتب وربطها بجدول الموظفين الجديد لجلب الاسم
 	const { data: salData } = await supabase
 	  .from('finance_salaries')
-	  .select('*, profiles(full_name)')
+	  .select('*, employees_edu(full_name)')
 	  .eq('workspace_id', workspace.id)
 	  .order('payment_month', { ascending: false });
 
-	const { data: tData } = await supabase
-	  .from('profiles')
-	  .select('id, full_name')
-	  .eq('workspace_id', workspace.id);
+	// 2. جلب قائمة جميع الموظفين (سواء كان لهم حساب أو لا) من جدول employees_edu
+	const { data: empData } = await supabase
+	  .from('employees_edu')
+	  .select('id, full_name, job_title')
+	  .eq('workspace_id', workspace.id)
+	  .order('full_name');
 
 	if (salData) setSalaries(salData);
-	if (tData) setTeachers(tData);
+	if (empData) setEmployees(empData);
 	setIsLoading(false);
   };
 
@@ -54,9 +57,10 @@ export default function Salaries() {
 	if (!error) {
 	  setIsModalOpen(false);
 	  fetchData();
-	  setFormData({ teacher_id: '', base_salary: 0, incentives: 0, deductions: 0, payment_month: new Date().toISOString().split('T')[0].substring(0, 7), status: 'معلق' });
+	  setFormData({ employee_id: '', base_salary: 0, incentives: 0, deductions: 0, payment_month: new Date().toISOString().split('T')[0].substring(0, 7), status: 'معلق' });
 	} else {
 	  alert('حدث خطأ أثناء الحفظ.');
+	  console.error(error);
 	}
   };
 
@@ -74,7 +78,7 @@ export default function Salaries() {
   return (
 	<PageShell
 	  title="الرواتب والحوافز"
-	  subtitle="إدارة مسيرات الرواتب، البدلات، والخصومات للهيئة التعليمية"
+	  subtitle="إدارة مسيرات الرواتب، البدلات، والخصومات لجميع منسوبي المنشأة"
 	  onPrint={() => window.print()}
 	  actionButton={
 		<button style={styles.btnPrimary} onClick={() => setIsModalOpen(true)}>
@@ -88,7 +92,7 @@ export default function Salaries() {
 		<table style={{ width: '100%', borderCollapse: 'collapse' }}>
 		  <thead>
 			<tr>
-			  <th style={styles.th}>الموظف / المعلم</th>
+			  <th style={styles.th}>الموظف</th>
 			  <th style={styles.th}>شهر الاستحقاق</th>
 			  <th style={styles.th}>الراتب الأساسي</th>
 			  <th style={styles.th}>الصافي (بعد البدلات والخصم)</th>
@@ -104,7 +108,7 @@ export default function Salaries() {
 				  <td style={{ ...styles.td, fontWeight: 800, color: 'var(--color-navy)' }}>
 					<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 					  <Banknote size={16} color="var(--color-royal)" />
-					  {s.profiles?.full_name}
+					  {s.employees_edu?.full_name || 'موظف محذوف'}
 					</div>
 				  </td>
 				  <td style={{ ...styles.td, fontFamily: 'monospace' }}>{s.payment_month.substring(0, 7)}</td>
@@ -147,10 +151,12 @@ export default function Salaries() {
 			<h2 style={{ margin: '0 0 24px 0', color: 'var(--color-navy)', fontSize: '1.4rem', fontWeight: 900 }}>تسجيل مسير راتب</h2>
 			<form onSubmit={handleSave}>
 			  <div style={styles.inputGroup}>
-				<label style={styles.label}>المعلم / الموظف</label>
-				<select required style={styles.input} value={formData.teacher_id} onChange={e => setFormData({...formData, teacher_id: e.target.value})}>
+				<label style={styles.label}>الموظف</label>
+				<select required style={styles.input} value={formData.employee_id} onChange={e => setFormData({...formData, employee_id: e.target.value})}>
 				  <option value="" disabled>اختر الموظف...</option>
-				  {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+				  {employees.map(emp => (
+					<option key={emp.id} value={emp.id}>{emp.full_name} ({emp.job_title})</option>
+				  ))}
 				</select>
 			  </div>
 

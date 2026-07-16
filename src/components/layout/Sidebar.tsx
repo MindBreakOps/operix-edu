@@ -3,8 +3,8 @@ import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, GraduationCap,
   CalendarDays, TableProperties, Activity, BookOpen, Book,
-  FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,
-  Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight, FileText
+  FileSignature, Calendar, Wallet, Landmark, Receipt, HeartHandshake,Scale,
+  Package, Bus, PenTool, Settings, ChevronDown, ChevronLeft, ChevronRight, FileText,Briefcase
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; 
 import logo from '../../assets/logo.png';
@@ -31,6 +31,7 @@ export const PAGE_INDEX: PageIndexEntry[] = [
   { key: 'students', label: 'الطلاب', icon: Users, group: 'المستخدمين', keywords: ['student'], allowedRoles: [ADMIN, TEACHER, ACCOUNTANT], color: '#10b981' },
   { key: 'parents', label: 'أولياء الأمور', icon: UserCheck, group: 'المستخدمين', keywords: ['parent'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#8b5cf6' },
   { key: 'teachers', label: 'الهيئة التعليمية', icon: GraduationCap, group: 'المستخدمين', keywords: ['teacher'], allowedRoles: [ADMIN], color: '#f59e0b' },
+  { key: 'staff', label: 'شؤون الموظفين (HR)', icon: Briefcase, group: 'المستخدمين', keywords: ['hr', 'staff', 'employee'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#6366f1' },
 
   { key: 'attendance', label: 'الحضور والغياب', icon: CalendarDays, group: 'الشؤون الأكاديمية', keywords: ['attendance'], allowedRoles: [ADMIN, TEACHER], color: '#ec4899' },
   { key: 'timetable', label: 'الجدول الدراسي', icon: TableProperties, group: 'الشؤون الأكاديمية', keywords: ['timetable'], allowedRoles: [ADMIN, TEACHER], color: '#8b5cf6' },
@@ -52,7 +53,9 @@ export const PAGE_INDEX: PageIndexEntry[] = [
   { key: 'finance/special-services', label: 'الخدمات الخاصة', icon: HeartHandshake, group: 'الإدارة والمالية', keywords: ['special services'], allowedRoles: [ADMIN, ACCOUNTANT], color: '#0ea5e9' },
 
   { key: 'dox-studio', label: 'Dox Studio', icon: PenTool, group: 'أدوات النظام', keywords: ['dox'], allowedRoles: [ADMIN], color: '#f59e0b' },
+  { key: 'regulations', label: 'اللوائح والقوانين', icon: Scale, group: 'الإدارة والمالية', keywords: ['regulations', 'rules'], allowedRoles: [ADMIN], color: '#f59e0b' },
   { key: 'settings', label: 'الإعدادات', icon: Settings, group: 'أدوات النظام', keywords: ['settings'], allowedRoles: [ADMIN], color: '#94a3b8' },
+  
 ];
 
 export const NAV_LABELS: Record<string, string> = PAGE_INDEX.reduce((acc, p) => {
