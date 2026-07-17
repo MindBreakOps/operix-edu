@@ -18,6 +18,7 @@ export default function StaffEdu() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null); 
   const [formData, setFormData] = useState({
+	employee_number: '', // تمت إضافة حقل الرقم الوظيفي للحالة
 	full_name: '',
 	profile_id: '',
 	job_title: 'معلم',
@@ -34,14 +35,12 @@ export default function StaffEdu() {
 	if (!workspace) return;
 	setIsLoading(true);
 	
-	// جلب جميع الموظفين من جدول employees_edu (من ضمنهم العمال)
 	const { data: staffData } = await supabase
 	  .from('employees_edu')
 	  .select('*, profiles(email)')
 	  .eq('workspace_id', workspace.id)
 	  .order('created_at', { ascending: false });
 	  
-	// جلب جميع الحسابات (profiles) للربط الاختياري
 	const { data: profilesData } = await supabase
 	  .from('profiles')
 	  .select('id, full_name, email')
@@ -138,6 +137,7 @@ export default function StaffEdu() {
   const openAddModal = () => {
 	setSelectedEmployee(null);
 	setFormData({
+	  employee_number: '',
 	  full_name: '', profile_id: '', job_title: '', department: 'الشؤون الأكاديمية',
 	  national_id: '', specialization: '', qualification: '', pdf_url: '', cert_url: ''
 	});
@@ -147,6 +147,7 @@ export default function StaffEdu() {
   const openEditModal = (employee: any) => {
 	setSelectedEmployee(employee);
 	setFormData({
+	  employee_number: employee.employee_number || '',
 	  full_name: employee.full_name || '',
 	  profile_id: employee.profile_id || '',
 	  job_title: employee.job_title || '',
@@ -174,7 +175,7 @@ export default function StaffEdu() {
 	  <div className="no-print" style={styles.infoBanner}>
 		<ShieldCheck size={20} />
 		<p style={{ margin: 0, fontSize: '0.9rem' }}>
-		  يمكنك إضافة أي موظف بالمنشأة (العمال والأمن) لتشمله مسيرات الرواتب. إذا كان معلماً أو مديراً، يمكنك ربط ملفه الوظيفي بحسابه في النظام من القائمة.
+		  يمكنك إضافة أي موظف بالمنشأة (العمال والأمن) لتشمله مسيرات الرواتب. يتم توليد الرقم الوظيفي تلقائياً.
 		</p>
 	  </div>
 
@@ -200,13 +201,20 @@ export default function StaffEdu() {
 					</div>
 					<div style={{ display: 'flex', flexDirection: 'column' }}>
 					  <span>{emp.full_name}</span>
-					  {emp.profiles?.email ? (
-						<span style={styles.linkedBadge}>
-						  <CheckCircle2 size={12} /> مرتبط بحساب النظام
+					  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+						{/* عرض الرقم الوظيفي */}
+						<span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+						  {emp.employee_number || '---'}
 						</span>
-					  ) : (
-						<span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>بدون حساب نظام</span>
-					  )}
+						{emp.profiles?.email && (
+						  <>
+							<span style={{ fontSize: '0.75rem', color: 'var(--color-border)' }}>|</span>
+							<span style={styles.linkedBadge}>
+							  <CheckCircle2 size={12} /> بحساب نظام
+							</span>
+						  </>
+						)}
+					  </div>
 					</div>
 				  </div>
 				</td>
@@ -244,6 +252,23 @@ export default function StaffEdu() {
 			</div>
 
 			<form onSubmit={handleSaveProfile}>
+			  {/* إضافة حقل الرقم الوظيفي للقراءة فقط */}
+			  <div style={{ marginBottom: '16px' }}>
+				<label style={styles.label}>الرقم الوظيفي (يولد تلقائياً)</label>
+				<input 
+				  style={{ 
+					...styles.input, 
+					backgroundColor: '#f1f5f9', 
+					color: 'var(--color-text-muted)',
+					cursor: 'not-allowed',
+					fontFamily: 'monospace'
+				  }} 
+				  value={formData.employee_number || ''} 
+				  disabled 
+				  placeholder="سيتم إصدار الرقم الوظيفي من قبل النظام عند الحفظ..." 
+				/>
+			  </div>
+
 			  <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
 				<div style={{ flex: 1 }}>
 				  <label style={styles.label}>الاسم الرباعي (إلزامي)</label>

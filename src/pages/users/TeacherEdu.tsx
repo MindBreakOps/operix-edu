@@ -17,12 +17,13 @@ interface Employee {
   full_name: string;
   job_title: string;
   department?: string | null;
-  national_id?: string | null;
+  employee_number?: string | null;
   specialization?: string | null;
   qualification?: string | null;
   hire_date?: string | null;
   pdf_url?: string | null;
   cert_url?: string | null;
+  
 }
 
 interface Attachment { name: string; url: string; }
@@ -697,7 +698,7 @@ export default function TeachersEdu() {
 				<div style={{ ...styles.avatarCircle, width: 52, height: 52, fontSize: '1.3rem' }}>{(selectedTeacher.full_name || '?').trim().charAt(0)}</div>
 				<div>
 				  <h2 style={{ margin: 0, color: 'var(--color-navy)' }}>{selectedTeacher.full_name}</h2>
-				  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{selectedTeacher.job_title} · رقم الهوية / الإقامة: {selectedTeacher.national_id || 'غير متوفر'}</span>
+				  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{selectedTeacher.job_title} · رقم الموظف: {selectedTeacher.employee_number || 'غير متوفر'}</span>
 				  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
 					{selectedTeacher.qualification && <span style={styles.metaChip}>{selectedTeacher.qualification}</span>}
 					{selectedTeacher.hire_date && <span style={styles.metaChip}>منذ {formatDateAr(selectedTeacher.hire_date)}</span>}
