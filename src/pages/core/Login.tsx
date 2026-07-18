@@ -14,10 +14,10 @@ const theme = {
   navyMid: '#161f34',
   navySoft: '#212c46',
   navyLine: 'rgba(255,255,255,0.08)',
-  gold: '#f2a922',
+  gold: '#f59e0b',
   goldDark: '#b45309',
   goldLight: '#fef3c7',
-  goldSoft: 'rgba(242,169,34,0.14)',
+  goldSoft: 'rgba(245,158,11,0.14)',
   azure: '#3b82f6',
   paper: '#fdfcfa',
   white: '#ffffff',
@@ -1145,5 +1145,5 @@ const styles: { [key: string]: React.CSSProperties } = {
   sealPulse: { position: 'absolute', inset: 0, borderRadius: '50%', background: `radial-gradient(circle, ${theme.gold}55 0%, transparent 72%)` },
   sealRing: { position: 'absolute', inset: '-8px', borderRadius: '50%', border: `1.5px dashed ${theme.gold}99`, borderTopColor: 'transparent', borderLeftColor: 'transparent' },
   sealRingRev: { position: 'absolute', inset: '-16px', borderRadius: '50%', border: `1px dashed ${theme.azure}55`, borderBottomColor: 'transparent', borderRightColor: 'transparent' },
-  sealCore: { position: 'relative', width: '74px', height: '74px', borderRadius: '50%', backgroundColor: theme.goldLight, border: `1px solid ${theme.gold}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 12px 32px rgba(0,0,0,0.4), inset 0 0 0 4px ${theme.white}`, zIndex: 1 }
+  sealCore: { position: 'relative', width: '74px', height: '74px', borderRadius: '50%', backgroundColor: theme.goldLight, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 12px 32px rgba(0,0,0,0.15)`, zIndex: 1 }
 };

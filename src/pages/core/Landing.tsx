@@ -6,6 +6,7 @@ import {
   CheckCircle, School, Search, ChevronDown, FileText
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
+import logoRemoved from '../../assets/logo Background Removed.png';
 
 const OPS_API = 'https://script.google.com/macros/s/AKfycbxzwlFPfOFiUS5atnjkAuXDcr-L_-LSY33_S9d6t12P36qmTWthc00ywCKpReFxzLY/exec';
 const TARGET_EMAIL = 'operixsolution@gmail.com';
@@ -14,7 +15,7 @@ const theme = {
   navy: '#0f172a', navyMid: '#1e293b', royal: '#2563eb', royalLight: '#3b82f6',
   pencil: '#f59e0b', pencilLight: '#fef3c7', pencilDark: '#d97706',
   slate: '#f8fafc', white: '#ffffff', border: '#e2e8f0', textMuted: '#64748b',
-  green: '#10b981', ink: '#334155',
+  orange: '#f59e0b', ink: '#334155',
 };
 
 // ─── COUNTRIES DATA ───
@@ -45,14 +46,24 @@ const gasCall = async (payload: any) => {
   }
 };
 
-const formatText = (text: string) => {
+const formatText = (text: string, operixColor?: string) => {
   if (!text) return text;
   const parts = text.split(/(OPERIX Edu|OPERIX)/g);
-  return parts.map((part, i) => 
-	(part === 'OPERIX' || part === 'OPERIX Edu') ? 
-	  <span key={i} style={{ color: theme.navy, backgroundColor: theme.white, padding: '2px 8px', borderRadius: '6px', fontWeight: 900, margin: '0 4px', fontStyle: 'normal', display: 'inline-flex', alignItems: 'center', lineHeight: 1 }}>{part}</span> 
-	  : <React.Fragment key={i}>{part}</React.Fragment>
-  );
+  const color = operixColor || theme.navy;
+  return parts.map((part, i) => {
+	if (part === 'OPERIX') {
+	  return <span key={i} style={{ color: color, fontWeight: 900 }}>{part}</span>;
+	}
+	if (part === 'OPERIX Edu') {
+	  return (
+		<span key={i} style={{ fontWeight: 900 }}>
+		  <span style={{ color: color }}>OPERIX </span>
+		  <span style={{ color: theme.orange }}>Edu</span>
+		</span>
+	  );
+	}
+	return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
 };
 
 function useScrollVisible(threshold = 0.15) {
@@ -116,7 +127,9 @@ const translations: Record<string, any> = {
 	termsTitle: "Terms of Use & Privacy Policy", termsEffective: "Effective Date: January 1, 2026 | Version 2.1", termsClose: "I Understand & Agree",
 	modalTitle: "Request a Demo", modalSub: "Fill out your school's details and our academic systems team will contact you.",
 	submit: "Send Request", submitting: "Sending...",
-	phoneLabel: "Country & Phone Number", searchCountry: "Search country...", phonePlaceholder: "Phone number (e.g. 5x xxx xxxx)"
+	phoneLabel: "Country & Phone Number", searchCountry: "Search country...", phonePlaceholder: "Phone number (e.g. 5x xxx xxxx)",
+	newsBadge: "Latest Release", newsAppTitle: "OPERIX Teacher", newsAppDesc: "The dedicated mobile companion for teachers is now live. Manage attendance, behavior, and tasks on the go.",
+	playStore: "Google Play"
   },
   ar: {
 	navFeatures: "المميزات", navVision: "الرؤية الأكاديمية", pricing: "الأسعار", login: "تسجيل الدخول", supportBtn: "الدعم الفني",
@@ -140,7 +153,9 @@ const translations: Record<string, any> = {
 	termsTitle: "شروط الاستخدام وسياسة الخصوصية", termsEffective: "تاريخ السريان: 1 يناير 2026 | الإصدار 2.1", termsClose: "أوافق وأفهم",
 	modalTitle: "طلب عرض تجريبي", modalSub: "أدخل بيانات المدرسة وسيتواصل معك فريق الأنظمة الأكاديمية قريباً.",
 	submit: "إرسال الطلب", submitting: "جاري الإرسال...",
-	phoneLabel: "الدولة ورقم الهاتف", searchCountry: "البحث عن دولة...", phonePlaceholder: "رقم الجوال (مثال: xxxx xxx 5x)"
+	phoneLabel: "الدولة ورقم الهاتف", searchCountry: "البحث عن دولة...", phonePlaceholder: "رقم الجوال (مثال: xxxx xxx 5x)",
+	newsBadge: "إصدار جديد", newsAppTitle: "تطبيق OPERIX للمعلم", newsAppDesc: "الرفيق الرقمي للمعلم متاح الآن. أدِر التحضير، السلوك، والمهام مباشرة من جوالك بكل سهولة.",
+	playStore: "جوجل بلاي"
   }
 };
 
@@ -315,6 +330,43 @@ function HeroDashboard({ isAr }: { isAr: boolean }) {
   );
 }
 
+function NewsBanner({ t, isAr }: { t: any; isAr: boolean }) {
+  return (
+	<div style={{ padding: '0 5% 40px', backgroundColor: theme.white }}>
+	  <div style={{ background: `linear-gradient(135deg, #f8fafc, #f1f5f9)`, borderRadius: '24px', padding: '32px', border: `1.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.03)' }}>
+		<div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: '1 1 400px' }}>
+		  <img src={logoRemoved} alt="App" style={{ width: '72px', height: '72px', objectFit: 'contain', flexShrink: 0 }} />
+		  <div>
+			<div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: theme.orange, color: theme.white, padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 900, marginBottom: '12px', textTransform: 'uppercase' }}>
+			  {t.newsBadge}
+			</div>
+			<h3 style={{ margin: '0 0 8px 0', fontSize: '1.5rem', fontWeight: 900, color: theme.navy }}>{t.newsAppTitle}</h3>
+			<p style={{ margin: 0, fontSize: '1.05rem', color: theme.textMuted, lineHeight: 1.6 }}>{t.newsAppDesc}</p>
+		  </div>
+		</div>
+
+		<div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+		  <a href="https://play.google.com/store/apps/details?id=com.example.operixedu" target="_blank" rel="noreferrer"
+			style={{ background: '#000000', color: theme.white, textDecoration: 'none', padding: '10px 24px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'transform 0.2s', border: '1px solid #333' }}
+			onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'}
+			onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M3.609 1.814C3.411 2.012 3.3 2.308 3.3 2.666V21.334C3.3 21.692 3.411 21.988 3.609 22.186L3.676 22.243L14.288 12.186V11.814L3.676 1.757L3.609 1.814Z" fill="#2196F3"/>
+			  <path d="M17.828 15.539L14.288 12.186V11.814L17.829 8.461L17.915 8.513L22.179 10.935C23.398 11.628 23.398 12.756 22.179 13.45L17.915 15.872L17.828 15.539Z" fill="#FFC107"/>
+			  <path d="M17.915 15.872L14.288 12.186L3.609 22.186C3.967 22.564 4.544 22.613 5.211 22.234L17.915 15.872Z" fill="#F44336"/>
+			  <path d="M17.915 8.513L5.211 2.151C4.544 1.772 3.967 1.821 3.609 2.199L14.288 12.186L17.915 8.513Z" fill="#4CAF50"/>
+			</svg>
+			<div style={{ textAlign: 'left' }}>
+			  <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', opacity: 0.9, lineHeight: 1 }}>GET IT ON</div>
+			  <div style={{ fontSize: '18px', fontWeight: 600, lineHeight: 1.2 }}>Google Play</div>
+			</div>
+		  </a>
+		</div>
+	  </div>
+	</div>
+  );
+}
+
 function FeatureCard({ icon, title, desc, index }: any) {
   const { ref, visible } = useScrollVisible();
   const [hovered, setHovered] = useState(false);
@@ -327,6 +379,125 @@ function FeatureCard({ icon, title, desc, index }: any) {
 	  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: hovered ? theme.white : theme.navy, margin: '0 0 12px 0', transition: 'color 0.3s' }}>{title}</h3>
 	  <p style={{ color: hovered ? '#94a3b8' : theme.textMuted, lineHeight: 1.7, margin: 0, transition: 'color 0.3s', fontSize: '0.95rem' }}>{desc}</p>
 	</div>
+  );
+}
+
+function MobileMockup({ screen, isAr }: { screen: string; isAr: boolean }) {
+  const colors = {
+	bg: '#F9FAFB', primary: theme.orange, navy: theme.navy, text: '#111827', textMuted: '#6B7280',
+	border: '#E5E7EB', card: '#FFFFFF', success: '#10b981', danger: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
+  };
+
+  const renderScreen = () => {
+	switch (screen) {
+	  case 'login':
+		return (
+		  <div style={{ height: '100%', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', background: `linear-gradient(180deg, #FFFBEB 0%, ${colors.bg} 100%)` }}>
+			<div style={{ width: '44px', height: '44px', background: '#FEF3C7', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+			  <CheckCircle size={22} color={colors.primary} />
+			</div>
+			<div style={{ fontSize: '14px', fontWeight: 900, display: 'flex', gap: '3px' }}>
+			  <span style={{ color: colors.navy }}>OPERIX</span><span style={{ color: colors.primary }}>Edu</span>
+			</div>
+			<div style={{ marginTop: '28px', width: '100%', padding: '14px', background: colors.card, borderRadius: '14px', boxShadow: '0 4px 10px rgba(0,0,0,0.04)' }}>
+			  <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '18px' }}>
+				{[1, 2, 3].map(i => <div key={i} style={{ width: '22px', height: '22px', borderRadius: '50%', background: i === 1 ? colors.navy : '#F3F4F6', color: i === 1 ? '#FFF' : colors.textMuted, fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>{i}</div>)}
+			  </div>
+			  <div style={{ height: '8px', width: '40%', background: '#F3F4F6', borderRadius: '4px', marginBottom: '8px' }} />
+			  <div style={{ height: '30px', width: '100%', border: `1px solid ${colors.border}`, borderRadius: '8px', marginBottom: '10px' }} />
+			  <div style={{ height: '34px', width: '100%', background: colors.primary, borderRadius: '8px' }} />
+			</div>
+		  </div>
+		);
+	  case 'attendance':
+		return (
+		  <div style={{ height: '100%', background: colors.bg, padding: '14px' }}>
+			<div style={{ fontSize: '13px', fontWeight: 900, color: colors.text, marginBottom: '10px' }}>{isAr ? 'تحضير الطلاب' : 'Attendance'}</div>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+			  {[isAr ? 'أحمد محمد' : 'Ahmed Omar', isAr ? 'ياسمين علي' : 'Yasmin Ali', isAr ? 'عمر خالد' : 'Omar Khalid'].map((name, i) => (
+				<div key={i} style={{ background: colors.card, padding: '10px', borderRadius: '10px', border: `1px solid ${colors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+				  <span style={{ fontSize: '10px', fontWeight: 700 }}>{name}</span>
+				  <div style={{ display: 'flex', gap: '3px' }}>
+					{[colors.success, colors.danger, colors.warning].map((c, j) => (
+					  <div key={j} style={{ width: '12px', height: '12px', borderRadius: '3px', background: (i === 0 && j === 0) || (i === 1 && j === 1) || (i === 2 && j === 2) ? c : '#F3F4F6' }} />
+					))}
+				  </div>
+				</div>
+			  ))}
+			</div>
+			<div style={{ position: 'absolute', bottom: '14px', left: '14px', right: '14px', height: '34px', background: colors.navy, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+			  <div style={{ width: '40%', height: '6px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px' }} />
+			</div>
+		  </div>
+		);
+	  case 'tasks':
+		return (
+		  <div style={{ height: '100%', background: colors.bg, padding: '14px' }}>
+			<div style={{ fontSize: '13px', fontWeight: 900, color: colors.text, marginBottom: '10px' }}>{isAr ? 'المهام التعليمية' : 'Teacher Tasks'}</div>
+			<div style={{ background: colors.card, padding: '12px', borderRadius: '12px', border: `1.5px solid ${colors.border}`, marginBottom: '8px', position: 'relative' }}>
+			  <div style={{ height: '8px', width: '50%', background: colors.navy, borderRadius: '4px', marginBottom: '6px' }} />
+			  <div style={{ height: '6px', width: '80%', background: '#F3F4F6', borderRadius: '4px', marginBottom: '10px' }} />
+			  <div style={{ display: 'flex', gap: '5px' }}>
+				<div style={{ padding: '3px 6px', background: '#FEE2E2', borderRadius: '4px', fontSize: '7px', fontWeight: 900, color: colors.danger }}>URGENT</div>
+				<div style={{ padding: '3px 6px', background: '#DBEAFE', borderRadius: '4px', fontSize: '7px', fontWeight: 900, color: colors.info }}>ACADEMIC</div>
+			  </div>
+			</div>
+			<div style={{ background: colors.card, padding: '12px', borderRadius: '12px', border: `1px solid ${colors.border}` }}>
+			  <div style={{ height: '8px', width: '40%', background: '#94a3b8', borderRadius: '4px', marginBottom: '6px' }} />
+			  <div style={{ padding: '3px 6px', display: 'inline-block', background: '#D1FAE5', borderRadius: '4px', fontSize: '7px', fontWeight: 900, color: colors.success }}>DONE</div>
+			</div>
+			<div style={{ position: 'absolute', bottom: '14px', right: '14px', width: '38px', height: '38px', borderRadius: '12px', background: colors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 6px 12px ${colors.primary}44` }}>
+			  <Sparkles size={16} color="#FFF" />
+			</div>
+		  </div>
+		);
+	  default: return null;
+	}
+  };
+
+  return (
+	<div style={{ width: '220px', height: '450px', background: '#111827', borderRadius: '32px', padding: '8px', position: 'relative', boxShadow: '0 30px 60px -12px rgba(0,0,0,0.25)', border: '1px solid #374151' }}>
+	  <div style={{ position: 'absolute', top: '8px', left: '50%', transform: 'translateX(-50%)', width: '70px', height: '18px', background: '#111827', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', zIndex: 10 }} />
+	  <div style={{ width: '100%', height: '100%', background: colors.bg, borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
+		{renderScreen()}
+	  </div>
+	</div>
+  );
+}
+
+function AppShowcase({ isAr }: { isAr: boolean }) {
+  const { ref, visible } = useScrollVisible();
+  const screens = ['login', 'attendance', 'tasks'];
+  const titles = isAr ? ['الدخول الذكي', 'التحضير الرقمي', 'إدارة المهام'] : ['Smart Login', 'Digital Attendance', 'Task Management'];
+  const descriptions = isAr ?
+	['نظام دخول آمن متعدد الخطوات بتصميم عصري.', 'تحضير الطلاب بلمسة واحدة مع دعم المرفقات والأعذار.', 'تنظيم المهام الأكاديمية حسب الأولوية والحالة.'] :
+	['Secure multi-step login with modern styling.', 'One-tap student attendance with support for attachments.', 'Organize academic tasks by priority and status.'];
+
+  return (
+	<section ref={ref} style={{ padding: '100px 5%', background: theme.white, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+	  <div style={{ position: 'absolute', top: '20%', left: '-10%', width: '400px', height: '400px', background: `${theme.orange}08`, borderRadius: '50%', filter: 'blur(80px)' }} />
+
+	  <div style={{ position: 'relative', zIndex: 1 }}>
+		<h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 900, color: theme.navy, marginBottom: '16px' }}>
+		  {isAr ? 'تجربة مستخدم استثنائية' : 'World-Class User Experience'}
+		</h2>
+		<p style={{ fontSize: '1.2rem', color: theme.textMuted, maxWidth: '700px', margin: '0 auto 80px' }}>
+		  {isAr ? 'لقد قمنا ببناء تطبيق OPERIX Teacher ليكون الأداة الأسرع والأكثر كفاءة في يد المعلم.' : 'We built OPERIX Teacher to be the fastest and most efficient tool in a teacher’s hand.'}
+		</p>
+
+		<div style={{ display: 'flex', justifyContent: 'center', gap: '60px', flexWrap: 'wrap', opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(40px)', transition: 'all 0.8s ease' }}>
+		  {screens.map((s, i) => (
+			<div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', flex: '0 1 240px' }}>
+			  <MobileMockup screen={s} isAr={isAr} />
+			  <div>
+				<div style={{ fontWeight: 900, color: theme.navy, fontSize: '1.2rem', marginBottom: '8px' }}>{titles[i]}</div>
+				<p style={{ fontSize: '0.9rem', color: theme.textMuted, lineHeight: 1.5, margin: 0 }}>{descriptions[i]}</p>
+			  </div>
+			</div>
+		  ))}
+		</div>
+	  </div>
+	</section>
   );
 }
 
@@ -397,7 +568,8 @@ export default function Landing() {
 	  {/* ─── HEADER ─── */}
 	  <header style={{ backgroundColor: scrolled ? 'rgba(255,255,255,0.95)' : theme.white, backdropFilter: scrolled ? 'blur(12px)' : 'none', borderBottom: `1px solid ${theme.border}`, padding: '14px 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, transition: 'all 0.3s ease', boxShadow: scrolled ? '0 4px 24px rgba(15,23,42,0.06)' : 'none' }}>
 		<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-		  <img src={logo} alt="OPERIX Edu" style={{ height: '38px', objectFit: 'contain' }} />
+		  <img src={logo} alt="OPERIX Edu" style={{ height: '36px', objectFit: 'contain' }} />
+		  <span style={{ fontSize: '1.2rem', fontWeight: 900, color: theme.navy }}>OPERIX <span style={{ color: theme.orange }}>Edu</span></span>
 		</div>
 		<nav style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
 		  {[{ label: t.navFeatures, href: '#features' }, { label: t.navVision, href: '#academic' }].map((item, i) => (
@@ -463,6 +635,12 @@ export default function Landing() {
 		</div>
 	  </section>
 
+	  {/* ─── NEWS BANNER ─── */}
+	  <NewsBanner t={t} isAr={isAr} />
+
+	  {/* ─── APP SHOWCASE ─── */}
+	  <AppShowcase isAr={isAr} />
+
 	  {/* ─── COMBINED STATS & VISION SECTION (NAVY BLUE) ─── */}
 	  <section id="academic" style={{ backgroundColor: theme.navy, position: 'relative', overflow: 'hidden' }}>
 		<div style={{ position: 'absolute', top: 0, [isAr ? 'right' : 'left']: '5%', opacity: 0.12, pointerEvents: 'none' }}>
@@ -485,7 +663,7 @@ export default function Landing() {
 				<AnimatedCounter target={stat.value} suffix={stat.suffix} />
 			  </div>
 			  <div style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 700, marginTop: '12px', lineHeight: 1.8 }}>
-				{formatText(stat.label)}
+				{formatText(stat.label, theme.white)}
 			  </div>
 			</div>
 		  ))}
@@ -497,10 +675,10 @@ export default function Landing() {
 			<BookOpen size={32} color={theme.pencil} />
 		  </div>
 		  <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 900, color: theme.white, marginBottom: '28px', lineHeight: 1.3 }}>
-			{formatText(t.visionTitle)}
+			{formatText(t.visionTitle, theme.white)}
 		  </h2>
 		  <p style={{ fontSize: '1.15rem', color: '#94a3b8', lineHeight: 2.2, fontStyle: 'italic' }}>
-			{formatText(t.visionDesc)}
+			{formatText(t.visionDesc, theme.white)}
 		  </p>
 		  <div style={{ position: 'absolute', top: '40px', [isAr ? 'right' : 'left']: '-20px', fontSize: '120px', color: `${theme.pencil}18`, fontFamily: 'Georgia, serif', lineHeight: 1 }}>"</div>
 		</div>
@@ -551,7 +729,7 @@ export default function Landing() {
 			<div>
 			  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
 				<img src={logo} alt="OPERIX" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
-				<span style={{ fontSize: '1.1rem', fontWeight: 900, color: theme.navy }}>OPERIX <span style={{ color: theme.pencil }}>Edu</span></span>
+				<span style={{ fontSize: '1.1rem', fontWeight: 900, color: theme.navy }}>OPERIX <span style={{ color: theme.orange }}>Edu</span></span>
 			  </div>
 			  <p style={{ color: theme.textMuted, fontSize: '0.9rem', lineHeight: 1.7, margin: '0 0 20px 0' }}>{t.footerTagline}</p>
 			  <div style={{ display: 'flex', gap: '8px' }}>

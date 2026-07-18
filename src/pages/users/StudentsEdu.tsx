@@ -147,7 +147,8 @@ const confirmImport = async () => {
 		
 		setIsUploading(false);
 	  };
-  // رفع الملفات والصور إلى جوجل درايف
+ 
+ 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
 	const file = e.target.files?.[0];
 	if (!file || !GAS_WEBHOOK_URL.includes('script.google.com')) return;
