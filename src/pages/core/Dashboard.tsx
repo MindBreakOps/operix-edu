@@ -32,9 +32,9 @@ const theme = {
 const STATUS = { PRESENT: 'حاضر', ABSENT: 'غائب', LATE: 'متأخر' };
 const FEE_STATUS = { PAID: 'مدفوع', UNPAID: 'غير مدفوع', OVERDUE: 'متأخر' };
 
-// currency-aware formatters — SAR and SDG are tracked separately, never summed together
+// currency-aware formatters — Enforces standard 0-9 numerals (English numbers) globally
 const fmtBy = (currency: string) =>
-  new Intl.NumberFormat(currency === 'SDG' ? 'ar-SD' : 'ar-SA', { maximumFractionDigits: 0 });
+  new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const currencySuffix = (currency: string) => (currency === 'SDG' ? 'ج.س' : '﷼');
 
 const todayISO = () => new Date().toISOString().split('T')[0];
@@ -123,7 +123,7 @@ export default function NewDashboardDesign() {
 		else if (r.status === STATUS.LATE) late++;
 	  });
 
-	  // --- fees, split by currency (SAR / SDG kept separate, never summed together) ---
+	  // --- fees, split by currency ---
 	  const feesMap: Record<string, FeesByCurrency> = {};
 	  (feesRes.data || []).forEach((f: any) => {
 		const currency = f.currency || 'SAR';
@@ -135,9 +135,7 @@ export default function NewDashboardDesign() {
 	  });
 	  setFeesByCurrency(Object.values(feesMap));
 
-	  // --- outstanding loans (finance_loans has no currency column in the schema —
-	  //     grouped by entity_type instead; amounts assumed SAR until a currency
-	  //     column is added here too) ---
+	  // --- outstanding loans ---
 	  const loanMap: Record<string, LoanSummary> = {};
 	  (loansRes.data || []).forEach((l: any) => {
 		const key = l.entity_type || 'أخرى';
@@ -189,10 +187,12 @@ export default function NewDashboardDesign() {
   return (
 	<div style={{ direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', 'Inter', sans-serif" }}>
 
-	  {/* ===================== STAT CARDS (all real) ===================== */}
+	  {/* ===================== STAT CARDS (Reordered by priority) ===================== */}
 	  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+		
+		{/* Core Primary Stats */}
 		<StatCard
-		  label="إجمالي الطلاب" value={isLoading ? '···' : stats.totalStudents.toLocaleString('ar-SA')}
+		  label="إجمالي الطلاب" value={isLoading ? '···' : stats.totalStudents.toLocaleString('en-US')}
 		  icon={<Users size={16} />} color={theme.cyan} bg={theme.cyanBg}
 		/>
 		<StatCard
@@ -201,20 +201,22 @@ export default function NewDashboardDesign() {
 		  trendText={isLoading ? undefined : `${stats.attendanceToday} من ${stats.totalStudents} طالب`}
 		/>
 		<StatCard
-		  label="أولياء الأمور" value={isLoading ? '···' : stats.activeGuardians.toLocaleString('ar-SA')}
-		  icon={<UsersRound size={16} />} color={theme.purple} bg={theme.purpleBg}
-		/>
-		<StatCard
-		  label="غياب اليوم" value={isLoading ? '···' : stats.absentToday.toString()}
+		  label="غياب اليوم" value={isLoading ? '···' : stats.absentToday.toLocaleString('en-US')}
 		  icon={<XCircle size={16} />} color={theme.danger} bg={theme.dangerBg}
 		  trendUp={false} trendText={isLoading ? undefined : `${stats.lateToday} حالة تأخر`}
 		/>
+
+		{/* Secondary Info Stats */}
 		<StatCard
-		  label="الواجبات النشطة" value={isLoading ? '···' : stats.activeAssignments.toString()}
+		  label="أولياء الأمور" value={isLoading ? '···' : stats.activeGuardians.toLocaleString('en-US')}
+		  icon={<UsersRound size={16} />} color={theme.purple} bg={theme.purpleBg}
+		/>
+		<StatCard
+		  label="الواجبات النشطة" value={isLoading ? '···' : stats.activeAssignments.toLocaleString('en-US')}
 		  icon={<FileSignature size={16} />} color={theme.warning} bg={theme.warningBg}
 		/>
 		<StatCard
-		  label="فعاليات قادمة" value={isLoading ? '···' : stats.upcomingEventsCount.toString()}
+		  label="فعاليات قادمة" value={isLoading ? '···' : stats.upcomingEventsCount.toLocaleString('en-US')}
 		  icon={<CalendarDays size={16} />} color={theme.royal} bg="rgba(79,125,243,0.12)"
 		/>
 	  </div>
@@ -297,7 +299,7 @@ export default function NewDashboardDesign() {
 				title={e.title}
 				time={formatShortDate(e.event_date)}
 				badge={e.is_public ? 'عامة' : 'داخلية'}
-				badgeColor={e.is_public ? theme.pink : theme.purple}
+				badgeColor={e.is_public ? theme.pink : theme.pinkBg}
 				badgeBg={e.is_public ? theme.pinkBg : theme.purpleBg}
 			  />
 			))
@@ -305,7 +307,7 @@ export default function NewDashboardDesign() {
 		</Panel>
 	  </div>
 
-	  {/* ===================== ROW: loans/debts (real, replaces the fabricated heatmap/ranking/gauge) ===================== */}
+	  {/* ===================== ROW: loans/debts ===================== */}
 	  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
 		<Panel title="المديونيات القائمة">
 		  {isLoading ? (
@@ -330,23 +332,6 @@ export default function NewDashboardDesign() {
 			</div>
 		  )}
 		</Panel>
-	  </div>
-
-	  {/* ===================== FOOTER STAT STRIP (real) ===================== */}
-	  <div style={{ backgroundColor: theme.white, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 2px rgba(19,27,46,0.04)', flexWrap: 'wrap', gap: '16px' }}>
-		<FooterStat icon={<Users size={16} />} color={theme.cyan} bg={theme.cyanBg} label="إجمالي الطلاب" value={isLoading ? '···' : stats.totalStudents.toLocaleString('ar-SA')} />
-		<FooterStat icon={<CheckCircle2 size={16} />} color={theme.success} bg={theme.successBg} label="حاضرون اليوم" value={isLoading ? '···' : stats.attendanceToday.toLocaleString('ar-SA')} badge={isLoading ? undefined : `${attendanceRate}%`} />
-		<FooterStat icon={<FileSignature size={16} />} color={theme.purple} bg={theme.purpleBg} label="الواجبات النشطة" value={isLoading ? '···' : stats.activeAssignments.toString()} />
-		<FooterStat icon={<Bell size={16} />} color={theme.warning} bg={theme.warningBg} label="فعاليات قادمة" value={isLoading ? '···' : stats.upcomingEventsCount.toString()} />
-		{feesByCurrency.map(fc => (
-		  <FooterStat
-			key={fc.currency}
-			icon={<Wallet size={16} />} color={theme.royal} bg="rgba(79,125,243,0.12)"
-			label={`رسوم مستحقة (${fc.currency})`}
-			value={`${fmtBy(fc.currency).format(fc.unpaid + fc.overdue)} ${currencySuffix(fc.currency)}`}
-		  />
-		))}
-		<FooterStat icon={<UsersRound size={16} />} color={theme.pink} bg={theme.pinkBg} label="أولياء أمور" value={isLoading ? '···' : stats.activeGuardians.toLocaleString('ar-SA')} />
 	  </div>
 	</div>
   );
@@ -426,23 +411,6 @@ function ActivityRow({ icon, color, bg, title, time, badge, badgeColor, badgeBg 
 	  <span style={{ fontSize: '0.68rem', fontWeight: 800, padding: '3px 9px', borderRadius: '99px', backgroundColor: badgeBg, color: badgeColor, flexShrink: 0 }}>
 		{badge}
 	  </span>
-	</div>
-  );
-}
-
-function FooterStat({ icon, color, bg, label, value, badge }: { icon: React.ReactNode; color: string; bg: string; label: string; value: string; badge?: string }) {
-  return (
-	<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-	  <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-		{icon}
-	  </div>
-	  <div>
-		<div style={{ fontSize: '0.74rem', color: theme.textMuted, fontWeight: 700 }}>{label}</div>
-		<div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-		  <span style={{ fontSize: '0.95rem', fontWeight: 800, color: theme.navy }}>{value}</span>
-		  {badge && <span style={{ fontSize: '0.66rem', fontWeight: 800, color: theme.success, backgroundColor: theme.successBg, padding: '2px 6px', borderRadius: '99px' }}>{badge}</span>}
-		</div>
-	  </div>
 	</div>
   );
 }

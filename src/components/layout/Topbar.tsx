@@ -4,7 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useTenant } from '../../context/TenantContext';
 import {
   Bell, Search, UserCircle, LogOut, Plus, Users, GraduationCap,
-  UserPlus, CheckCircle2, ChevronLeft, Settings, User as UserIcon, CornerDownLeft
+  UserPlus, CheckCircle2, ChevronLeft, Settings, User as UserIcon, CornerDownLeft,
+  AlertCircle, UserX, ClipboardList, BookOpen // Added icons for dynamic notifications
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { NAV_LABELS, PORTAL_LABELS, PAGE_INDEX, PageIndexEntry } from './Sidebar';
@@ -78,6 +79,10 @@ export default function Topbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   
+  // States for Notifications
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   // State for user data
   const [fullName, setFullName] = useState('جاري التحميل...');
   const [userRole, setUserRole] = useState<string>(ADMIN);
@@ -107,7 +112,6 @@ export default function Topbar() {
 		setFullName(data.full_name || user.email?.split('@')[0] || 'المستخدم');
 		setUserRole(data.role_id);
 		
-		// Set Arabic display name based on database UUID
 		if (data.role_id === ADMIN) setRoleName('مدير النظام');
 		else if (data.role_id === TEACHER) setRoleName('معلم');
 		else if (data.role_id === ACCOUNTANT) setRoleName('محاسب');
@@ -119,7 +123,78 @@ export default function Topbar() {
 	fetchProfileData();
   }, [user]);
 
-  // 2. Close menus on outside click
+  // 2. LIVE NOTIFICATION ENGINE (Debts, Attendance, Results, Tasks)
+  useEffect(() => {
+	if (!workspace) return;
+
+	const fetchAlerts = async () => {
+	  const today = new Date().toISOString().split('T')[0];
+	  const newAlerts = [];
+
+	  // Fetch Pending Teacher Tasks
+	  const { data: tasks } = await supabase
+		.from('teachers_edu_tasks')
+		.select('id, task_name')
+		.eq('workspace_id', workspace.id)
+		.eq('status', 'pending')
+		.limit(2);
+
+	  // Fetch Overdue Debts / Loans
+	  const { data: loans } = await supabase
+		.from('finance_loans')
+		.select('id, entity_type, loan_amount, paid_amount, due_date')
+		.eq('workspace_id', workspace.id)
+		.lt('due_date', today)
+		.limit(2);
+
+	  // Fetch Today's Late/Absent Attendance
+	  const { data: attendance } = await supabase
+		.from('attendance_edu')
+		.select('id, status')
+		.eq('workspace_id', workspace.id)
+		.eq('date', today)
+		.in('status', ['غائب', 'متأخر'])
+		.limit(2);
+
+	  // Fetch Recent Academic Results
+	  const { data: results } = await supabase
+		.from('results_edu')
+		.select('id, marks_obtained')
+		.eq('workspace_id', workspace.id)
+		.order('created_at', { ascending: false })
+		.limit(2);
+
+	  // Map dynamic data into unified notification components
+	  if (tasks) {
+		tasks.forEach(t => newAlerts.push({ id: t.id, title: 'مهمة معلقة', desc: t.task_name, icon: ClipboardList, color: '#3b82f6', bg: '#eff6ff' }));
+	  }
+	  if (loans) {
+		loans.filter(l => (l.loan_amount || 0) > (l.paid_amount || 0)).forEach(l => newAlerts.push({ id: l.id, title: 'مديونية متأخرة', desc: `مستحقة على: ${l.entity_type}`, icon: AlertCircle, color: '#ef4444', bg: '#fef2f2' }));
+	  }
+	  if (attendance) {
+		attendance.forEach(a => newAlerts.push({ id: a.id, title: 'تنبيه حضور', desc: `تم تسجيل طالب (${a.status})`, icon: UserX, color: '#f59e0b', bg: '#fffbeb' }));
+	  }
+	  if (results) {
+		results.forEach(r => newAlerts.push({ id: r.id, title: 'نتيجة جديدة', desc: `تم رصد درجة: ${r.marks_obtained}`, icon: BookOpen, color: '#10b981', bg: '#ecfdf5' }));
+	  }
+
+	  setNotifications(newAlerts);
+
+	  // Trigger Audio Alert if new notifications arrive
+	  if (newAlerts.length > 0) {
+		setUnreadCount(newAlerts.length);
+		try {
+		  const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+		  // Note: Modern browsers require the user to have interacted with the document (clicked anywhere) before audio is allowed to autoplay
+		  alertSound.play().catch(e => console.warn('Audio autoplay blocked by browser until user interaction occurs.'));
+		} catch (e) {}
+	  }
+	};
+
+	fetchAlerts();
+  }, [workspace]);
+
+  // 3. Close menus on outside click
   useEffect(() => {
 	const handleClickOutside = (e: MouseEvent) => {
 	  if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setShowAddMenu(false);
@@ -131,7 +206,7 @@ export default function Topbar() {
 	return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 3. Search Shortcut
+  // 4. Search Shortcut
   useEffect(() => {
 	const handleKeyDown = (e: KeyboardEvent) => {
 	  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -156,10 +231,7 @@ export default function Topbar() {
 	navigate(`/app/${currentPortal}/${path}`);
   };
 
-  // ---------- Search Results (Filtered by Role) ----------
   const searchResults = useMemo(() => {
-	// Check if allowedRoles exists on the page type. If it does, filter by it.
-	// We cast to any here just in case PAGE_INDEX in Sidebar hasn't fully updated its typing
 	const allowedPages = PAGE_INDEX.filter(p => {
 	  const allowedRoles = (p as any).allowedRoles;
 	  return !allowedRoles || allowedRoles.includes(userRole);
@@ -228,8 +300,8 @@ export default function Topbar() {
 		.profile-menu-item { transition: background-color 0.15s ease; }
 		.profile-menu-item:hover { background-color: #f5f7fb; }
 		.topbar-search-input:focus-within { border-color: #4f7df3 !important; }
-		.breadcrumb-link { color: #8592ab; text-decoration: none; transition: color 0.15s ease; }
-		.breadcrumb-link:hover { color: #131b2e; }
+		.breadcrumb-link { color: #8592ab; text-decoration: none; transition: all 0.15s ease; }
+		.breadcrumb-link:hover { color: #3b82f6; transform: translateY(-1px); }
 		.search-result-item { transition: background-color 0.12s ease; }
 		.search-result-item.active-result, .search-result-item:hover { background-color: #eef2fb; }
 	  `}</style>
@@ -237,21 +309,24 @@ export default function Topbar() {
 	  <header className="no-print" style={styles.topbar}>
 		<div style={styles.rightSection}>
 		  <div style={styles.workspaceInfo}>
-			<span style={styles.workspaceName}>{workspace?.name || 'جاري التحميل...'}</span>
+			<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+			  <span style={styles.workspaceName}>{workspace?.name || 'جاري التحميل...'}</span>
+			  <span style={styles.portalTag}>{PORTAL_LABELS[currentPortal] || currentPortal}</span>
+			</div>
+			
 			<nav style={styles.breadcrumbRow} aria-label="مسار التنقل">
 			  {crumbs.map((c, i) => (
 				<React.Fragment key={c.path}>
-				  {i > 0 && <ChevronLeft size={13} color="#a0aac2" />}
+				  {i > 0 && <ChevronLeft size={14} color="#94a3b8" />}
 				  {i === crumbs.length - 1 ? (
 					<span style={styles.breadcrumbCurrent}>{c.label}</span>
 				  ) : (
-					<Link to={c.path} className="breadcrumb-link" style={{ fontSize: '0.78rem', fontWeight: 700 }}>
+					<Link to={c.path} className="breadcrumb-link" style={{ fontSize: '0.82rem', fontWeight: 700 }}>
 					  {c.label}
 					</Link>
 				  )}
 				</React.Fragment>
 			  ))}
-			  <span style={styles.portalTag}>{PORTAL_LABELS[currentPortal] || currentPortal}</span>
 			</nav>
 		  </div>
 		</div>
@@ -339,29 +414,53 @@ export default function Topbar() {
 			)}
 		  </div>
 
+		  {/* NOTIFICATION HUB */}
 		  <div style={{ position: 'relative' }} ref={notificationsRef}>
 			<button
 			  className="topbar-icon-btn"
-			  onClick={() => { setShowNotifications(!showNotifications); setShowAddMenu(false); setShowProfileMenu(false); }}
+			  onClick={() => { 
+				setShowNotifications(!showNotifications); 
+				setShowAddMenu(false); 
+				setShowProfileMenu(false); 
+				if (!showNotifications) setUnreadCount(0); // Mark as read upon opening
+			  }}
 			  style={styles.iconButton}
 			>
 			  <Bell size={19} color="#4a5570" />
-			  <span style={styles.notificationDot}>1</span>
+			  {unreadCount > 0 && <span style={styles.notificationDot}>{unreadCount}</span>}
 			</button>
 
 			{showNotifications && (
 			  <div className="topbar-dropdown" style={styles.notificationsMenu}>
 				<div style={styles.notificationsHeader}>
-				  <span style={{ fontWeight: 800, color: '#0f172a' }}>الإشعارات</span>
+				  <span style={{ fontWeight: 800, color: '#0f172a' }}>الإشعارات الحديثة</span>
+				  <button onClick={() => setNotifications([])} style={{ background: 'none', border: 'none', fontSize: '0.72rem', color: '#4f7df3', fontWeight: 700, cursor: 'pointer' }}>مسح الكل</button>
 				</div>
-				<div style={styles.notificationItem}>
-				  <span style={styles.unreadDot} />
-				  <div style={styles.notificationIcon}><CheckCircle2 size={16} color="#16a34a" /></div>
-				  <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-					<span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#131b2e' }}>تحديث النظام</span>
-					<span style={{ fontSize: '0.75rem', color: '#64748b' }}>تم تسجيل الدخول بنجاح.</span>
-				  </div>
+
+				<div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+				  {notifications.length === 0 ? (
+					<div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 700 }}>
+					  لا توجد تنبيهات جديدة في النظام.
+					</div>
+				  ) : (
+					notifications.map((notif, idx) => (
+					  <div key={idx} style={styles.notificationItem}>
+						{unreadCount > 0 && <span style={styles.unreadDot} />}
+						<div style={{ ...styles.notificationIcon, backgroundColor: notif.bg }}>
+						  <notif.icon size={16} color={notif.color} />
+						</div>
+						<div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+						  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#131b2e' }}>{notif.title}</span>
+						  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{notif.desc}</span>
+						</div>
+					  </div>
+					))
+				  )}
 				</div>
+				
+				<Link to={`/app/${currentPortal}/notifications`} style={styles.notificationsFooter}>
+				  عرض سجل الإشعارات بالكامل
+				</Link>
 			  </div>
 			)}
 		  </div>
@@ -411,15 +510,14 @@ export default function Topbar() {
   );
 }
 
-// Keep your existing styles down here unchanged...
 const styles: { [key: string]: React.CSSProperties } = {
   topbar: { height: '72px', backgroundColor: '#ffffff', borderBottom: '1px solid #e4e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', flexShrink: 0, zIndex: 30 },
   rightSection: { display: 'flex', alignItems: 'center' },
-  workspaceInfo: { display: 'flex', flexDirection: 'column', gap: '4px' },
-  workspaceName: { fontSize: '1.05rem', color: '#131b2e', fontWeight: 800 },
-  breadcrumbRow: { display: 'flex', alignItems: 'center', gap: '6px' },
-  breadcrumbCurrent: { fontSize: '0.78rem', fontWeight: 700, color: '#4f7df3' },
-  portalTag: { marginRight: '8px', fontSize: '0.68rem', fontWeight: 800, color: '#4f7df3', backgroundColor: '#e9eefb', padding: '2px 8px', borderRadius: '999px' },
+  workspaceInfo: { display: 'flex', flexDirection: 'column', gap: '6px' },
+  workspaceName: { fontSize: '1.25rem', color: '#0f172a', fontWeight: 900, letterSpacing: '-0.3px' },
+  breadcrumbRow: { display: 'flex', alignItems: 'center', gap: '8px' },
+  breadcrumbCurrent: { fontSize: '0.82rem', fontWeight: 800, color: '#2563eb', backgroundColor: '#eff6ff', padding: '4px 10px', borderRadius: '6px' },
+  portalTag: { fontSize: '0.75rem', fontWeight: 800, color: '#ffffff', backgroundColor: '#3b82f6', padding: '4px 12px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)' },
   leftSection: { display: 'flex', alignItems: 'center', gap: '16px' },
   actionButton: { display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#4f7df3', color: '#ffffff', border: 'none', padding: '9px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.88rem', transition: 'filter 0.15s ease' },
   dropdownMenu: { position: 'absolute', top: '48px', left: '0', backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 12px 28px -6px rgba(16,26,46,0.14)', width: '230px', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 50, border: '1px solid #e4e8f0' },
@@ -439,7 +537,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   notificationItem: { padding: '14px 16px', display: 'flex', gap: '10px', alignItems: 'flex-start', borderBottom: '1px solid #f8fafc', cursor: 'pointer', position: 'relative' },
   unreadDot: { width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#4f7df3', marginTop: '6px', flexShrink: 0 },
   notificationIcon: { backgroundColor: '#e6f6ec', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  notificationsFooter: { padding: '12px', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#4f7df3', textDecoration: 'none', borderTop: '1px solid #eef1f6' },
+  notificationsFooter: { display: 'block', padding: '12px', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#4f7df3', textDecoration: 'none', borderTop: '1px solid #eef1f6', backgroundColor: '#f8fafc' },
   divider: { height: '32px', width: '1px', backgroundColor: '#e4e8f0' },
   profileSection: { display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' },
   profileText: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
@@ -448,5 +546,5 @@ const styles: { [key: string]: React.CSSProperties } = {
   profileMenu: { position: 'absolute', top: '52px', left: '0', backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 12px 28px -6px rgba(16,26,46,0.14)', width: '240px', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 50, border: '1px solid #e4e8f0' },
   profileMenuHeader: { padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '2px', borderBottom: '1px solid #eef1f6' },
   profileMenuItem: { padding: '11px 16px', display: 'flex', alignItems: 'center', gap: '10px', color: '#334155', fontSize: '0.87rem', fontWeight: 700, cursor: 'pointer', border: 'none', background: 'none', textAlign: 'right', width: '100%', textDecoration: 'none' },
-  logoutMenuItem: { borderTop: '1px solid #eef1f6' },
+  logoutMenuItem: { borderTop: '1px solid #eef1f6' }
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useTenant } from '../../context/TenantContext';
@@ -68,85 +67,61 @@ const fetchStudents = async () => {
 	});
   };
 
-// 1. Triggered when a file is selected
-	const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
-	  const file = e.target.files?.[0];
-	  if (!file) return;
+  // 1. Triggered when a file is selected
+  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+	const file = e.target.files?.[0];
+	if (!file) return;
+
+	// TODO: Replace this mock data with your actual file parsing logic (e.g., using SheetJS/xlsx)
+	const parsedDataMock = [
+	  { id: 'temp_1', full_name: 'أحمد محمد', national_id: '1029384756', grade_level: 'الأول الابتدائي', status: 'نشط' },
+	  { id: 'temp_2', full_name: 'سارة خالد', national_id: '1092837465', grade_level: 'الثاني الابتدائي', status: 'نشط' },
+	  { id: 'temp_3', full_name: 'فارغ - خطأ بالملف', national_id: '', grade_level: '', status: 'مفصول' }, 
+	];
+
+	setStagedImports(parsedDataMock);
+	setIsPreviewModalOpen(true);
+	e.target.value = ''; 
+  };
+
+  // 2. Remove a single item from the preview
+  const removeStagedItem = (idToRemove: string) => {
+	setStagedImports(prev => prev.filter(item => item.id !== idToRemove));
+  };
+
+  // 3. Confirm and push to database
+// 3. Confirm and push to database
+	const confirmImport = async () => {
+	  if (!workspace || !portalType) return;
+	  setIsUploading(true);
+	  
+	  // Map the staged data into the exact schema your database expects
+	  const payload = stagedImports.map(row => ({
+		workspace_id: workspace.id,
+		portal_type: portalType,
+		full_name: row.full_name || 'بدون اسم',
+		national_id: row.national_id || null,
+		grade_level: row.grade_level || 'غير محدد',
+		status: row.status || 'نشط',
+		behavior_score: 100 // Default value required by your schema
+	  }));
   
-	  if (type === 'excel') {
-		const reader = new FileReader();
-		
-		reader.onload = (event) => {
-		  try {
-			const binaryStr = event.target?.result;
-			// Parse the raw binary into an Excel workbook
-			const workbook = XLSX.read(binaryStr, { type: 'binary' });
-			
-			// Grab the very first sheet inside the file
-			const sheetName = workbook.SheetNames[0];
-			const worksheet = workbook.Sheets[sheetName];
-			
-			// Convert that sheet into a neat array of JavaScript objects
-			const rawJson = XLSX.utils.sheet_to_json(worksheet);
-			
-			// Map the Excel columns to your database schema
-			// (Make sure the Arabic/English column headers match exactly what's in your template!)
-			const mappedData = rawJson.map((row: any, index: number) => ({
-			  id: `temp_${index}_${Date.now()}`,
-			  full_name: row['اسم الطالب'] || row['Name'] || '',
-			  national_id: row['رقم الهوية'] || row['ID'] || '',
-			  grade_level: row['الصف الدراسي'] || row['Grade'] || '',
-			  status: 'نشط'
-			}));
-  
-			setStagedImports(mappedData);
-			setIsPreviewModalOpen(true);
-		  } catch (error) {
-			console.error("Error parsing Excel file:", error);
-			alert("حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف Excel صالح.");
-		  }
-		};
-  
-		// Read the file as a binary string so the parser can understand it
-		reader.readAsBinaryString(file);
+	  // Execute bulk insert into Supabase
+	  const { error } = await supabase.from('students_edu').insert(payload);
+	  
+	  if (error) {
+		console.error("Import Error:", error.message);
+		alert("حدث خطأ أثناء حفظ البيانات المستوردة في قاعدة البيانات.");
 	  } else {
-		// PDF and Word fallback
-		alert("عذراً، قراءة ملفات Word و PDF تتطلب إعدادات متقدمة في الخادم (Backend). يرجى استخدام قالب Excel حالياً لاستيراد البيانات.");
+		// Clear the staging area and refresh the table
+		setStagedImports([]);
+		setIsPreviewModalOpen(false);
+		await fetchStudents();
 	  }
-  
-	  // Reset input so you can select the same file again if needed
-	  e.target.value = ''; 
+	  
+	  setIsUploading(false);
 	};
-const confirmImport = async () => {
-		if (!workspace || !portalType) return;
-		setIsUploading(true);
-		
-		// Map the staged data into the exact schema your database expects
-		const payload = stagedImports.map(row => ({
-		  workspace_id: workspace.id,
-		  portal_type: portalType,
-		  full_name: row.full_name || 'بدون اسم',
-		  national_id: row.national_id || null,
-		  grade_level: row.grade_level || 'غير محدد',
-		  status: row.status || 'نشط',
-		  behavior_score: 100 // Default value required by your schema
-		}));
-	
-		// Execute bulk insert into Supabase
-		const { error } = await supabase.from('students_edu').insert(payload);
-		
-		if (error) {
-		  console.error("Import Error:", error.message);
-		  alert("حدث خطأ أثناء حفظ البيانات المستوردة في قاعدة البيانات.");
-		} else {
-		  // Clear the staging area and refresh the table
-		  setStagedImports([]);
-		  setIsPreviewModalOpen(false);
-		  await fetchStudents();
-		}
-		
-		setIsUploading(false);
-	  };
+
   // رفع الملفات والصور إلى جوجل درايف
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
 	const file = e.target.files?.[0];

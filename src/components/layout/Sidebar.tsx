@@ -128,42 +128,42 @@ export default function Sidebar() {
 		  display: flex;
 		  align-items: center;
 		  gap: 12px;
-		  padding: 9px 12px;
+		  padding: 10px 14px;
 		  border-radius: 10px;
 		  text-decoration: none;
-		  color: #90a0c0;
-		  font-weight: 600;
-		  font-size: 0.92rem;
+		  color: #cbd5e1; /* Brightened main link text */
+		  font-weight: 700;
+		  font-size: 1rem; /* Increased base font size */
 		  transition: background-color 0.18s ease, color 0.18s ease;
 		  position: relative;
 		  white-space: nowrap;
 		}
 		.sidebar-nav-link:hover {
-		  background-color: rgba(255, 255, 255, 0.045);
-		  color: #f1f5f9;
+		  background-color: rgba(255, 255, 255, 0.08);
+		  color: #ffffff;
 		}
 		.sidebar-nav-link.active {
-		  background: linear-gradient(90deg, rgba(79,125,243,0.16), rgba(79,125,243,0.05));
+		  background: linear-gradient(90deg, rgba(79,125,243,0.2), rgba(79,125,243,0.05));
 		  color: #ffffff;
-		  font-weight: 700;
+		  font-weight: 800;
 		}
 		.sidebar-nav-link.active::before {
 		  content: '';
 		  position: absolute;
 		  right: 0; top: 8px; bottom: 8px;
-		  width: 3px;
-		  border-radius: 3px;
+		  width: 4px;
+		  border-radius: 4px;
 		  background: var(--icon-color, #4f7df3);
 		}
 
 		.sidebar-nav-link svg { 
 		  flex-shrink: 0; 
 		  transition: transform 0.25s ease, color 0.18s ease;
-		  color: #7686a8; 
+		  color: #94a3b8; 
 		}
 		.sidebar-nav-link:hover svg {
 		  color: var(--icon-color);
-		  transform: translateX(-1px);
+		  transform: translateX(-2px);
 		}
 		.sidebar-nav-link.active svg {
 		  color: var(--icon-color);
@@ -172,53 +172,56 @@ export default function Sidebar() {
 		.sidebar-group-toggle {
 		  display: flex; align-items: center; justify-content: space-between;
 		  width: 100%; background: none; border: none; cursor: pointer;
-		  padding: 4px 12px 7px 12px; color: #56648a;
-		  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-		  letter-spacing: 0.08em;
+		  padding: 8px 12px 10px 12px; 
+		  color: #94a3b8; /* Brightened sub-directory header */
+		  font-size: 0.85rem; /* Increased size for visibility */
+		  font-weight: 800; 
+		  text-transform: uppercase;
+		  letter-spacing: 0.05em;
 		}
-		.sidebar-group-toggle:hover { color: #8fa2c9; }
-		.sidebar-group-toggle svg { transition: transform 0.2s ease, color 0.18s ease; color: #56648a; width: 13px; height: 13px; }
-		.sidebar-group-toggle:hover svg { color: #8fa2c9; }
+		.sidebar-group-toggle:hover { color: #f1f5f9; }
+		.sidebar-group-toggle svg { transition: transform 0.2s ease, color 0.18s ease; color: #94a3b8; width: 14px; height: 14px; }
+		.sidebar-group-toggle:hover svg { color: #f1f5f9; }
 		.sidebar-group-toggle.open svg { transform: rotate(180deg); }
 
 		.sidebar-group-items {
-		  display: flex; flex-direction: column; gap: 2px;
+		  display: flex; flex-direction: column; gap: 4px;
 		  max-height: 0; overflow: hidden;
 		  transition: max-height 0.3s ease-in-out;
 		}
-		.sidebar-group-items.open { max-height: 700px; }
+		.sidebar-group-items.open { max-height: 700px; padding-bottom: 8px; }
 
 		.sidebar-collapse-btn {
 		  position: absolute; top: 34px; left: -13px;
-		  width: 24px; height: 24px; border-radius: 50%;
+		  width: 26px; height: 26px; border-radius: 50%;
 		  background: #1a2540; border: 1px solid #2c3a5c;
 		  display: flex; align-items: center; justify-content: center;
 		  cursor: pointer; color: #cbd5e1; z-index: 25;
-		  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+		  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 		  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 		}
-		.sidebar-collapse-btn:hover { transform: scale(1.08); background: #4f7df3; border-color: #4f7df3; color: #ffffff; }
+		.sidebar-collapse-btn:hover { transform: scale(1.1); background: #38bdf8; border-color: #38bdf8; color: #ffffff; }
 
 		.nav-tooltip {
 		  position: absolute; right: calc(100% + 14px); top: 50%;
 		  transform: translateY(-50%);
-		  background: #101a2e; color: #fff; padding: 7px 14px;
-		  border-radius: 6px; font-size: 0.84rem; font-weight: 700;
+		  background: #101a2e; color: #fff; padding: 8px 16px;
+		  border-radius: 8px; font-size: 0.9rem; font-weight: 800;
 		  white-space: nowrap; opacity: 0; pointer-events: none;
-		  transition: opacity 0.15s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		  transition: opacity 0.15s ease; box-shadow: 0 6px 16px rgba(0,0,0,0.4);
 		  border: 1px solid #263455;
 		}
 		.sidebar-nav-link:hover .nav-tooltip { opacity: 1; }
 	  `}</style>
 
-	  <aside className="no-print" style={{ ...styles.sidebar, width: collapsed ? '92px' : '304px' }}>
+	  <aside className="no-print" style={{ ...styles.sidebar, width: collapsed ? '92px' : '320px' }}>
 
 		<button
 		  className="sidebar-collapse-btn"
 		  onClick={() => setCollapsed((c) => !c)}
 		  title={collapsed ? 'توسيع القائمة' : 'طي القائمة'}
 		>
-		  {collapsed ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+		  {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
 		</button>
 
 		<div style={styles.header}>
@@ -229,7 +232,7 @@ export default function Sidebar() {
 			{!collapsed && (
 			  <div style={styles.brandTextCol}>
 				<h2 style={styles.logoText}>OPERIX <span style={styles.logoAccent}>Edu</span></h2>
-				<span style={styles.brandSub}>لوحة التحكم</span>
+				<span style={styles.brandSub}>لوحة التحكم المركزية</span>
 			  </div>
 			)}
 		  </div>
@@ -242,7 +245,7 @@ export default function Sidebar() {
 				<option value="intermediate">المتوسطة</option>
 				<option value="secondary">الثانوية</option>
 			  </select>
-			  <ChevronDown size={16} style={styles.chevron} />
+			  <ChevronDown size={18} style={styles.chevron} />
 			</div>
 		  )}
 		</div>
@@ -256,7 +259,7 @@ export default function Sidebar() {
 				  onClick={() => toggleGroup(index)}
 				>
 				  <span>{group.title}</span>
-				  <ChevronDown size={15} />
+				  <ChevronDown size={16} />
 				</button>
 			  )}
 			  <div className={`sidebar-group-items ${collapsed || openGroups.has(index) ? 'open' : ''}`}>
@@ -268,11 +271,11 @@ export default function Sidebar() {
 					  to={link.path}
 					  className={`sidebar-nav-link ${active ? 'active' : ''}`}
 					  style={{ 
-						...(collapsed ? { justifyContent: 'center', padding: '13px' } : {}),
+						...(collapsed ? { justifyContent: 'center', padding: '14px' } : {}),
 						'--icon-color': link.color 
 					  } as React.CSSProperties}
 					>
-					  <link.icon size={22} />
+					  <link.icon size={24} />
 					  {!collapsed && <span>{link.name}</span>}
 					  {collapsed && <span className="nav-tooltip">{link.name}</span>}
 					</Link>
@@ -308,28 +311,29 @@ const styles: { [key: string]: React.CSSProperties } = {
 	boxShadow: '4px 0 24px rgba(0,0,0,0.12)',
   },
   header: {
-	padding: '20px 18px 18px 18px',
-	borderBottom: '1px solid #1b2540',
+	padding: '24px 20px 22px 20px',
+	backgroundColor: '#15203b', // Added a distinct background to the header block
+	borderBottom: '2px solid #1e2b4d', // Thickened the border to define the zone
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '18px',
+	gap: '20px',
   },
   brandRow: {
 	display: 'flex',
 	alignItems: 'center',
-	gap: '11px',
+	gap: '14px',
   },
   logoChip: {
-	width: '40px',
-	height: '40px',
-	borderRadius: '11px',
+	width: '44px',
+	height: '44px',
+	borderRadius: '12px',
 	backgroundColor: '#ffffff',
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center',
 	flexShrink: 0,
-	padding: '5px',
-	boxShadow: '0 2px 8px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.04)',
+	padding: '6px',
+	boxShadow: '0 4px 12px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05)',
   },
   logoImg: {
 	width: '100%',
@@ -339,50 +343,50 @@ const styles: { [key: string]: React.CSSProperties } = {
   brandTextCol: {
 	display: 'flex',
 	flexDirection: 'column',
-	gap: '1px',
+	gap: '2px',
 	minWidth: 0,
   },
   logoText: {
 	color: '#ffffff',
-	fontSize: '1.16rem',
-	fontWeight: 800,
+	fontSize: '1.35rem', // Larger, bolder typography
+	fontWeight: 900,
 	margin: 0,
-	letterSpacing: '-0.3px',
+	letterSpacing: '-0.5px',
 	whiteSpace: 'nowrap',
   },
   logoAccent: {
-	color: '#4f7df3',
+	color: '#38bdf8', // Brighter, more vibrant cyan to perfect the logo contrast
   },
   brandSub: {
-	fontSize: '0.72rem',
-	color: '#5c6a8a',
-	fontWeight: 600,
+	fontSize: '0.78rem',
+	color: '#94a3b8',
+	fontWeight: 700,
   },
   portalSwitcher: {
 	width: '100%',
-	padding: '10px 34px 10px 14px',
+	padding: '12px 36px 12px 16px',
 	borderRadius: '10px',
-	border: '1px solid #22304e',
-	backgroundColor: '#141d34',
-	color: '#e7ebf5',
-	fontWeight: 700,
-	fontSize: '0.88rem', 
+	border: '1px solid #263859',
+	backgroundColor: '#0d1526',
+	color: '#f8fafc',
+	fontWeight: 800,
+	fontSize: '0.95rem', 
 	appearance: 'none',
 	cursor: 'pointer',
 	outline: 'none',
-	transition: 'border-color 0.15s ease',
+	transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
   },
   chevron: {
-	position: 'absolute', right: '13px', top: '50%', transform: 'translateY(-50%)',
-	pointerEvents: 'none', color: '#5c6a8a',
+	position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
+	pointerEvents: 'none', color: '#94a3b8',
   },
   nav: {
-	padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '14px',
+	padding: '20px 14px', display: 'flex', flexDirection: 'column', gap: '18px',
 	overflowY: 'auto', flex: 1,
   },
   navGroup: { display: 'flex', flexDirection: 'column' },
   footer: {
-	padding: '14px 20px', borderTop: '1px solid #1b2540',
+	padding: '16px 20px', borderTop: '1px solid #1b2540',
   },
-  footerText: { fontSize: '0.72rem', color: '#5c6a8a', fontWeight: 600 },
+  footerText: { fontSize: '0.78rem', color: '#5c6a8a', fontWeight: 700 },
 };
